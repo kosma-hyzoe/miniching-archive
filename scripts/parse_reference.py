@@ -1,13 +1,13 @@
 import yaml
 
 from miniching.files import read_serialization_data, REFERENCE
-from miniching.files import RESOURCES_PATH
+from miniching.files import RESOURCES_DIR
 
 
 def main():
     add_yaml_representers()
-    json_ref = read_serialization_data(RESOURCES_PATH + "/original_reference.json")
-    yaml_ref = read_serialization_data(RESOURCES_PATH + "/reference.yaml")
+    json_ref = read_serialization_data(RESOURCES_DIR + "/original_reference.json")
+    yaml_ref = read_serialization_data(RESOURCES_DIR + "/reference.yaml")
 
     for i in range(1, 65):
         yaml_ref[i] = {}
@@ -21,7 +21,7 @@ def main():
 
 def write_reference(value: dict, append_mode=True):
     mode = "a" if append_mode else "w"
-    with open(RESOURCES_PATH + "/reference.yaml", mode) as f:
+    with open(RESOURCES_DIR + "/reference.yaml", mode) as f:
         yaml.dump(value, f, allow_unicode=True, width=120, sort_keys=False)
 
 

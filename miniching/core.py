@@ -1,48 +1,42 @@
 import argparse
-from datetime import datetime
-from collections import OrderedDict
-from pprint import pprint
-from textwrap import wrap
-
-from miniching.files import BINARY_TO_DECIMAL, DECIMAL_TO_BINARY, write_simple_history, write_map_history, \
-    MODIFIED_ZHU_XI_LINE_EVALUATION, \
-    REFERENCE
 import random
 import re
+from collections import OrderedDict
+from datetime import datetime
 
+from miniching.files import write_simple_history, write_map_history
+from miniching.files import BINARY_TO_DECIMAL, DECIMAL_TO_BINARY, MODIFIED_ZHU_XI_LINE_EVALUATION, REFERENCE
 from miniching.reading_parser import ReadingParser
 
 
 def main():
-    modes = _get_parser_args()
-
+    modes = get_parser_args()
     now = datetime.now().isoformat(timespec="minutes")
+
     if modes.quick:
-        query = "..."
+        query = '"..."'
         timestamp = now
         excerpt = get_excerpt_with_coin_toss()
     else:
-        timestamp = input("Timestamp: ") if modes.evaluate_from_excerpt else now
-        timestamp = now if timestamp == "now" else timestamp
-        query = input("Query: ")
-        excerpt = input("Excerpt: ") if modes.evaluate_from_excerpt else get_excerpt_with_coin_toss()
+        timestamp = input("Timestamp:\n\t") if modes.manual_timestamp else now
+        query = '\"%s\"'.format(input("Query:\n\t"))
+        excerpt = input("Excerpt:\n\t") if modes.evaluate_from_excerpt else get_excerpt_with_coin_toss()
 
-    # decoded_excerpt = decode_excerpt(excerpt)
-    decoded_excerpt = decode_excerpt("2:1,4")
+    decoded_excerpt = decode_excerpt(excerpt)
+    reading = get_reading(timestamp, query, decoded_excerpt, modes.classic)
 
-    reading = get_reading(timestamp, query, decoded_excerpt, modes.classic, modes.full_text)
-
+    reading_parser = ReadingParser(reading)
     if not modes.no_print:
-        reading_parser = ReadingParser(reading)
-        print(reading_parser.get_parsed_reading(skip_query=True, skip_timestamp=True))
-
+        parsed_reading = reading_parser.get_reading_as_printable_output(modes.full_text)
+        print(parsed_reading)
     if modes.simple_history:
-        write_simple_history()
+        parsed_reading = reading_parser.get_reading_as_simple_history_record()
+        write_simple_history(parsed_reading)
     if modes.map_history:
-        write_map_history()
+        pass
 
 
-def _get_parser_args():
+def get_parser_args():
     parser = argparse.ArgumentParser()
 
     quick_help = "get reading with other args overriden to default, empty query and current timestamp"
@@ -51,7 +45,9 @@ def _get_parser_args():
     parser.add_argument('-c', '--classic', action='store_true', help=classic_help)
     evaluate_help = "get reading from prompted excerpt using '64' format for pure hexes or '63:1,2' with changing lines"
     parser.add_argument('-e', '--evaluate-from-excerpt', action='store_true', help=evaluate_help)
+
     parser.add_argument('-f', '--full-text', action='store_true', help='get a full reading')
+    parser.add_argument('-t', '--manual-timestamp', action="store_true", help="insert timestamp via input prompt")
     parser.add_argument('-n', '--no-print', action='store_true', help='skip printing the reading')
     parser.add_argument('-s', '--simple-history', action='store_true', help='write to simple history file')
     parser.add_argument('-m', '--map-history', action='store_true', help='write to map history file')
@@ -113,29 +109,13 @@ def decode_excerpt(excerpt: str):
     return decoded_excerpt
 
 
-def get_reading(timestamp: str, query: str, decoded_excerpt: dict, classic=False, full_text=False) -> dict:
+def get_reading(timestamp: str, query: str, decoded_excerpt: dict, classic: bool) -> dict:
     hex_decimal = decoded_excerpt["hex_decimal"]
-    transformed_hex_decimal = decoded_excerpt["transformed_hex_decimal"]
+    hex_sign = REFERENCE[hex_decimal]['sign']
     changing_lines = decoded_excerpt["changing_lines"]
 
     reading = OrderedDict({"timestamp": timestamp, "query": query})
-
-    hex_sign = REFERENCE[hex_decimal]['sign']
-    if not transformed_hex_decimal:
-        reading["result"] = f"{hex_decimal} : {hex_sign}"
-    else:
-        transformed_hex_sign = REFERENCE[transformed_hex_decimal]['sign']
-        reading["result"] = f"{hex_decimal} -> {transformed_hex_decimal} : {hex_sign} -> {transformed_hex_sign}"
-
-    if not full_text:
-        if classic and changing_lines:
-            reading["changing_lines"] = ", ".join([str(line) for line in changing_lines])
-        elif changing_lines:
-            reading["changing_lines"] = ", ".join([str(line) for line in changing_lines])
-            reading["lines_to_read"] = MODIFIED_ZHU_XI_LINE_EVALUATION[len(changing_lines)]
-        return reading
-
-    hex_dictionary = {
+    hexagram_dict = {
         "title": REFERENCE[hex_decimal]["title"],
         "intro": REFERENCE[hex_decimal]["intro"],
         "judgement": REFERENCE[hex_decimal]["judgement"],
@@ -143,23 +123,35 @@ def get_reading(timestamp: str, query: str, decoded_excerpt: dict, classic=False
         "image": REFERENCE[hex_decimal]["image"],
         "image_commentary": REFERENCE[hex_decimal]["image_commentary"],
     }
-    if not transformed_hex_decimal:
-        reading['hexagram'] = hex_dictionary
-        return reading
 
-    reading["hexagram"] = hex_dictionary
-    reading["transformed_hexagram"] = {
-        "title": REFERENCE[transformed_hex_decimal]["title"],
-        "intro": REFERENCE[transformed_hex_decimal]["intro"],
-        "judgement": REFERENCE[transformed_hex_decimal]["judgement"],
-        "commentary": REFERENCE[transformed_hex_decimal]["commentary"],
-        "image": REFERENCE[transformed_hex_decimal]["image"],
-        "image_commentary": REFERENCE[transformed_hex_decimal]["image_commentary"],
-    }
+    if not changing_lines:
+        reading["result"] = f"{hex_decimal} : {hex_sign}"
+        reading["hexagram"] = hexagram_dict
+
+        return reading
+    else:
+        transformed_hex_decimal = decoded_excerpt["transformed_hex_decimal"]
+        transformed_hex_sign = REFERENCE[transformed_hex_decimal]['sign']
+
+        reading["result"] = f"{hex_decimal} -> {transformed_hex_decimal} : {hex_sign} -> {transformed_hex_sign}"
+        reading["changing_lines"] = ", ".join([str(line) for line in changing_lines])
+        if not classic:
+            reading["lines_to_read"] = MODIFIED_ZHU_XI_LINE_EVALUATION[len(changing_lines)]
+
+        reading["hexagram"] = hexagram_dict
+        reading["transformed_hexagram"] = {
+            "title": REFERENCE[transformed_hex_decimal]["title"],
+            "intro": REFERENCE[transformed_hex_decimal]["intro"],
+            "judgement": REFERENCE[transformed_hex_decimal]["judgement"],
+            "commentary": REFERENCE[transformed_hex_decimal]["commentary"],
+            "image": REFERENCE[transformed_hex_decimal]["image"],
+            "image_commentary": REFERENCE[transformed_hex_decimal]["image_commentary"],
+        }
+
     if len(changing_lines) == 6 and hex_decimal == 1 or len(changing_lines) == 6 and hex_decimal == 2:
         reading["hexagram"]["special_comment"] = REFERENCE[hex_decimal]["lines"]["special"]
     elif not classic and len(changing_lines) == 4 or not classic and len(changing_lines) == 5:
-        line_to_read = [line for line in range(1, 6 + 1) if line not in changing_lines][0]
+        line_to_read = [line for line in range(1, 7) if line not in changing_lines][0]
         reading["transformed_hexagram"][line_to_read] = REFERENCE[transformed_hex_decimal]["lines"][line_to_read]
     else:
         lines_reference = REFERENCE[hex_decimal]["lines"]
