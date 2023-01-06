@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # miniching
 [//]: # (#### Video Demo: todo)
 
@@ -70,13 +69,8 @@ lines apply (i.e. 3 -> 27 : ䷂ -> ䷚, where changing lines are 5th and 6th).
 
 The user should now read all of related text using preferred evaluation method. 
 
-
-
 #### Recommended sources for an in-depth reference:
 * [Wikipedia](https://en.wikipedia.org/wiki/I_Ching)
 * [Biroco](https://www.biroco.com/yijing/index.htm)
 * [The Gnostic Book Of Changes](https://www.jamesdekorne.com/GBCh/GBCh.htm)
 * [Carl Jung and the I Ching](https://carl-jung.net/iching.html)
-=======
-### _in progress_
->>>>>>> main
