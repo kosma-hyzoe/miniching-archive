@@ -26,9 +26,9 @@ def read_serialization_data(path) -> dict:
 def write_simple_history(parsed_reading: str):
     path_dir = get_config().get("paths", "SIMPLE_HISTORY_DIR")
     if path_dir == "default":
-        path = os.path.join(_DEFAULT_HISTORY_DIR, "simple-history.txy")
+        path = os.path.join(_DEFAULT_HISTORY_DIR, "simple-history.txt")
     else:
-        path = os.path.join(path_dir, "simple-history.txy")
+        path = os.path.join(path_dir, "simple-history.txt")
 
     with open(path, "a+") as f:
         f.write(parsed_reading)
@@ -37,9 +37,9 @@ def write_simple_history(parsed_reading: str):
 def write_map_history(map_record: dict):
     path_dir = get_config().get("paths", "MAP_HISTORY_DIR")
     if path_dir == "default":
-        path = os.path.join(_DEFAULT_HISTORY_DIR, "map-history.yaml")
+        path = os.path.join(_DEFAULT_HISTORY_DIR, "map-history.txt")
     else:
-        path = os.path.join(path_dir, "map-history.yaml")
+        path = os.path.join(path_dir, "map-history.txt")
 
     try:
         with open(path, "r") as f:
@@ -61,7 +61,7 @@ def write_map_history(map_record: dict):
 
 _RESOURCES_DIR = os.path.join(ROOT_DIR, "resources")
 _DEFAULT_HISTORY_DIR = os.environ['HOME']
-REFERENCE = read_serialization_data(_RESOURCES_DIR + "/reference.yaml")
+REFERENCE = read_serialization_data(_RESOURCES_DIR + "/iching_reference.yaml")
 MODIFIED_ZHU_XI_LINE_EVALUATION = read_serialization_data(_RESOURCES_DIR + "/modified_zhu_xi_line_evaluation.yaml")
 BINARY_TO_DECIMAL = read_serialization_data(_RESOURCES_DIR + "/binary_to_decimal.yaml")
 DECIMAL_TO_BINARY = {value: key for key, value in BINARY_TO_DECIMAL.items()}

@@ -13,13 +13,12 @@ def main():
     if modes.quick:
         query = '...'
         timestamp = now
-        excerpt = get_excerpt_with_coin_toss()
     else:
         timestamp = input("Timestamp:\n\t") if modes.manual_timestamp else now
-        query = '\"%s\"'.format(input("Query:\n\t"))
-        excerpt = input("Excerpt:\n\t") if modes.evaluate_excerpt else get_excerpt_with_coin_toss()
+        query = input("Query:\n\t")
+    excerpt = input("Excerpt:\n\t") if modes.evaluate_excerpt else get_excerpt_with_coin_toss()
 
-    decoded_excerpt = decode_excerpt("27:3,5")
+    decoded_excerpt = decode_excerpt(excerpt)
     reading = get_reading(timestamp, query, decoded_excerpt, modes.classic)
 
     reading_parser = ReadingParser(reading)
