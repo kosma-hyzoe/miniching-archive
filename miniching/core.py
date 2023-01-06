@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 
-from miniching.files import write_simple_history, write_map_history
+from .files import write_simple_history, write_map_history
 from miniching.files import BINARY_TO_DECIMAL, DECIMAL_TO_BINARY, MODIFIED_ZHU_XI_LINE_EVALUATION, REFERENCE
 from miniching.reading_parser import ReadingParser
 
@@ -39,9 +39,9 @@ def main():
 def get_parser_args():
     parser = argparse.ArgumentParser()
 
-    quick_help = "get reading with other args overriden to default, empty query and current timestamp"
+    quick_help = "get a reading with other args overriden to default, an empty query and a current timestamp"
     parser.add_argument('-q', '--quick', action="store_true", help=quick_help)
-    classic_help = "use classic evaluation / 'read all changing lines' instead of default modified Zhu Xi method"
+    classic_help = "use classic evaluation/'read all changing lines' instead of the default modified Zhu Xi method"
     parser.add_argument('-c', '--classic', action='store_true', help=classic_help)
     evaluate_help = "get reading from prompted excerpt using '64' format for pure hexes or '63:1,2' with changing lines"
     parser.add_argument('-e', '--evaluate-from-excerpt', action='store_true', help=evaluate_help)
@@ -161,4 +161,3 @@ def get_reading(timestamp: str, query: str, decoded_excerpt: dict, classic: bool
 
 if __name__ == "__main__":
     main()
-
