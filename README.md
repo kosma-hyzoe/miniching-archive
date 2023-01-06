@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # miniching
 [//]: # (#### Video Demo: todo)
 
@@ -76,3 +77,6 @@ The user should now read all of related text using preferred evaluation method.
 * [Biroco](https://www.biroco.com/yijing/index.htm)
 * [The Gnostic Book Of Changes](https://www.jamesdekorne.com/GBCh/GBCh.htm)
 * [Carl Jung and the I Ching](https://carl-jung.net/iching.html)
+=======
+### _in progress_
+>>>>>>> main
