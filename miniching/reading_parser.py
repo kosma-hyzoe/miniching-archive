@@ -41,7 +41,6 @@ class ReadingParser:
             if key == "timestamp":
                 self._parse_section_divider(value, capitalize=False)
             elif key == "result":
-                self._parse_section_divider(key)
                 formatted_result = self.get_formatted_result()
                 self._parse_section_content(formatted_result)
             elif key in self.SKIP_FOR_SIMPLE_HISTORY_OUTPUT:
@@ -103,7 +102,7 @@ class ReadingParser:
             joined_lines = ("".join([self.line_break, indent])).join(value_lines)
             self.parsed_reading = "".join([self.parsed_reading, joined_lines])
         else:
-            wrapped_value = wrap(value, width=self.width, initial_indent=indent, subsequent_indent=indent)
+            wrapped_value = wrap(value, width=80, initial_indent=indent, subsequent_indent=indent)
             self.parsed_reading = "".join([self.parsed_reading, self.line_break.join(wrapped_value)])
 
         if item_break:
