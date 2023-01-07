@@ -1,5 +1,4 @@
 # miniching
-#### [Click here for a video demo](https://www.youtube.com/watch?v=K6esbD3UZlk)
 
 ---
 ## What is miniching?
