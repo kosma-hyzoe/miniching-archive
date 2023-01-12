@@ -1,5 +1,17 @@
 import argparse
 
+from miniching.reading.parse import ReadingParser
+
+
+def prompt_query():
+    query = input("Query:\n\t")
+    print(ReadingParser.section_break)
+    return query
+
+
+def prompt_manual_timestamp():
+    pass
+
 
 def get_modes():
     parser = argparse.ArgumentParser()

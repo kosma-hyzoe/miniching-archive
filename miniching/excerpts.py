@@ -24,7 +24,7 @@ def get_excerpt_with_coin_toss() -> str:
         return str(hex_decimal)
 
 
-def decode_excerpt(excerpt: str):
+def get_decoded_excerpt(excerpt: str):
     if not re.match(r"\d{1,2}:(\d,){0,5}\d", excerpt) and not re.match(r"\d{1,2}", excerpt):
         raise ValueError("invalid excerpt format. use '64' for pure hexes or '64:1,2,3' for hexes with changing lines")
 
