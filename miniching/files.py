@@ -23,17 +23,44 @@ def read_serialization_data(path) -> dict:
 
 
 def write_simple_history(parsed_reading: str):
-    path = get_config().get("paths", "simple_history_dir") + "/simple-history.txt"
+    path_dir = get_config().get("paths", "SIMPLE_HISTORY_DIR")
+    if path_dir == "default":
+        path = os.path.join(_DEFAULT_HISTORY_DIR, "simple-history.txt")
+    else:
+        path = os.path.join(path_dir, "simple-history.txt")
+
     with open(path, "a+") as f:
         f.write(parsed_reading)
 
 
-def write_map_history(parsed_reading: str):
-    pass
+def write_map_history(map_record: dict):
+    path_dir = get_config().get("paths", "MAP_HISTORY_DIR")
+    if path_dir == "default":
+        path = os.path.join(_DEFAULT_HISTORY_DIR, "map-history.txt")
+    else:
+        path = os.path.join(path_dir, "map-history.txt")
+
+    try:
+        with open(path, "r") as f:
+            map_history = yaml.safe_load(f)
+    except FileNotFoundError:
+        map_history = {}
+
+    content = [value for value in map_record["content"].values()]
+    if not map_history:
+        map_history = {}
+    if not map_history.get(map_record["hex_decimal"]):
+        map_history[map_record["hex_decimal"]] = [content]
+    else:
+        map_history[map_record["hex_decimal"]].append(content)
+
+    with open(path, "w") as f:
+        yaml.dump(map_history, f, allow_unicode=True, sort_keys=True)
 
 
-RESOURCES_DIR = ROOT_DIR + "/resources/"
-REFERENCE = read_serialization_data(RESOURCES_DIR + "reference.yaml")
-MODIFIED_ZHU_XI_LINE_EVALUATION = read_serialization_data(RESOURCES_DIR + "modified_zhu_xi_line_evaluation.yaml")
-BINARY_TO_DECIMAL = read_serialization_data(RESOURCES_DIR + "binary_to_decimal.yaml")
+_RESOURCES_DIR = os.path.join(ROOT_DIR, "resources")
+_DEFAULT_HISTORY_DIR = os.environ['HOME']
+REFERENCE = read_serialization_data(_RESOURCES_DIR + "/iching_reference.yaml")
+MODIFIED_ZHU_XI_LINE_EVALUATION = read_serialization_data(_RESOURCES_DIR + "/modified_zhu_xi_line_evaluation.yaml")
+BINARY_TO_DECIMAL = read_serialization_data(_RESOURCES_DIR + "/binary_to_decimal.yaml")
 DECIMAL_TO_BINARY = {value: key for key, value in BINARY_TO_DECIMAL.items()}
