@@ -28,3 +28,12 @@ def get_formatted_title(title):
     elif "[" in title:
         title_copy = title[:title.index("[") - 1]
     return f"'{title_copy}'"
+
+
+def get_formatted_line_div():
+    pass
+
+
+# todo pass title with no formatting and with unicode, delete unicode from result
+def get_formatted_hexagram_div():
+    pass
