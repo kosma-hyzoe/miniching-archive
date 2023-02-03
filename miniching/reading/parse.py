@@ -1,37 +1,10 @@
 from textwrap import wrap
 
-from miniching.serialization import get_config, REFERENCE
-from miniching.reading.format import SECTION_BREAK, WIDTH, LINE_BREAK, INDENT, INITIAL_INDENT
-
-
-def format_result(result):
-    hex_decimal = result[0]
-    hex_sign = REFERENCE[hex_decimal]['sign']
-    if len(result) == 1:
-        result = f"{hex_decimal}"
-        if get_config()["formats"].getboolean("unicode_result_mirroring"):
-            result += f" : {hex_sign}"
-    else:
-        transformed_hex_decimal = result[1]
-        transformed_hex_sign = REFERENCE[transformed_hex_decimal]['sign']
-        result = f"{hex_decimal} -> {transformed_hex_decimal}"
-        if get_config()["formats"].getboolean("unicode_result_mirroring"):
-            result += f" : {hex_sign} -> {transformed_hex_sign}"
-
-    return result
-
-
-def format_hexagram_header(header):
-    if "(" in header:
-        header = header[:header.index("(") - 1]
-    elif "[" in header:
-        header = header[:header.index("[") - 1]
-
-    return header
+from miniching.reading.format import SECTION_BREAK, WIDTH, LINE_BREAK, INDENT, INITIAL_INDENT, format_result, \
+    format_hexagram_header
 
 
 class ReadingParser:
-
     def __init__(self, reading: dict):
         self.parsed_reading = []
         self.reading = reading
