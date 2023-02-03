@@ -1,8 +1,9 @@
 from miniching.files import REFERENCE
 
 
-def get_human_readable_timestamp(timestamp):
-    return timestamp.strftime("%d-%m-%Y")
+# todo load format from config
+def format_datetime(datetime):
+    return datetime.strftime("%d-%m-%Y")
 
 
 def get_formatted_result(result, unicode_mirroring=True) -> str:

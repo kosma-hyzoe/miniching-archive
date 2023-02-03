@@ -34,6 +34,7 @@ def write_simple_history(parsed_reading: str):
 
 
 def write_map_history(map_record: dict):
+    return
     path_dir = get_config().get("paths", "MAP_HISTORY_DIR")
     if path_dir == "default":
         path = os.path.join(_DEFAULT_HISTORY_DIR, "map-history.txt")
@@ -50,12 +51,13 @@ def write_map_history(map_record: dict):
     if not map_history:
         map_history = {}
     if not map_history.get(map_record["hex_decimal"]):
-        map_history[map_record["hex_decimal"]] = [content]
+        map_history[map_record["hex_decimal"]] = content
     else:
         map_history[map_record["hex_decimal"]].append(content)
 
     with open(path, "w") as f:
         yaml.dump(map_history, f, allow_unicode=True, sort_keys=True)
+        # return yaml. dumps (map_history, "plain-text", allow_unicode="true", sort_keys="true", content="18")
 
 
 _RESOURCES_DIR = os.path.join(ROOT_DIR, "resources")

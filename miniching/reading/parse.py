@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from textwrap import wrap
 
-from miniching.files import REFERENCE, MODIFIED_ZHU_XI_LINE_EVALUATION
-from miniching.reading.format import get_formatted_result, get_formatted_title, get_human_readable_timestamp
+from miniching.reading.format import get_formatted_result, get_formatted_title
 
 
 class ReadingParser:
@@ -11,62 +10,14 @@ class ReadingParser:
     line_break = "\n"
     section_break = "\n" * 2
 
-    parsed_reading: str
-
-    def __init__(self, timestamp: str, query: str, decoded_excerpt: dict, classic: bool):
-        hex_decimal = decoded_excerpt["hex_decimal"]
-        changing_lines = decoded_excerpt["changing_lines"]
-
-        self.reading = OrderedDict({"timestamp": timestamp, "query": query})
-        hexagram_dict = {
-            "title": REFERENCE[hex_decimal]["title"],
-            "intro": REFERENCE[hex_decimal]["intro"],
-            "judgement": REFERENCE[hex_decimal]["judgement"],
-            "commentary": REFERENCE[hex_decimal]["commentary"],
-            "image": REFERENCE[hex_decimal]["image"],
-            "image_commentary": REFERENCE[hex_decimal]["image_commentary"],
-        }
-
-        if not changing_lines:
-            self.reading['result'] = tuple([hex_decimal])
-            self.reading["hexagram"] = hexagram_dict
-        else:
-            transformed_hex_decimal = decoded_excerpt["transformed_hex_decimal"]
-            self.reading['result'] = tuple([hex_decimal, transformed_hex_decimal])
-
-            self.reading["changing_lines"] = ", ".join([str(line) for line in changing_lines])
-            if not classic:
-                self.reading["lines_to_read"] = MODIFIED_ZHU_XI_LINE_EVALUATION[len(changing_lines)]
-
-            self.reading["hexagram"] = hexagram_dict
-            self.reading["transformed_hexagram"] = {
-                "title": REFERENCE[transformed_hex_decimal]["title"],
-                "intro": REFERENCE[transformed_hex_decimal]["intro"],
-                "judgement": REFERENCE[transformed_hex_decimal]["judgement"],
-                "commentary": REFERENCE[transformed_hex_decimal]["commentary"],
-                "image": REFERENCE[transformed_hex_decimal]["image"],
-                "image_commentary": REFERENCE[transformed_hex_decimal]["image_commentary"],
-            }
-            if len(changing_lines) == 6 and hex_decimal == 1 or len(changing_lines) == 6 and hex_decimal == 2:
-                self.reading["hexagram"]["lines"] = {}
-                self.reading["hexagram"]["lines"]["special_comment"] = REFERENCE[hex_decimal]["lines"]["special"]
-            elif not classic and len(changing_lines) == 4 or not classic and len(changing_lines) == 5:
-                line_to_read = [line for line in range(1, 7) if line not in changing_lines][0]
-                self.reading["transformed_hexagram"]["lines"] = {}
-                line_to_read = REFERENCE[transformed_hex_decimal]["lines"][line_to_read]
-                self.reading["transformed_hexagram"]["lines"][line_to_read] = line_to_read
-            else:
-                lines_reference = REFERENCE[hex_decimal]["lines"]
-                self.reading["hexagram"]["lines"] = {}
-                [self.reading["hexagram"]["lines"].update({line: lines_reference[line]}) for line in changing_lines]
-
-    def get_reading(self, key=None):
-        return self.reading if not key else self.reading.get(key)
+    def __init__(self, reading: dict):
+        self.parsed_reading = None
+        self.reading = reading
 
     def get_reading_as_simple_history_record(self) -> str:
         self.parsed_reading = ""
 
-        human_readable_timestamp = get_human_readable_timestamp(self.reading["timestamp"])
+        human_readable_timestamp = self.reading["timestamp"]
         self._parse_section_divider(human_readable_timestamp, capitalize=False)
 
         self._parse_section_content(self.reading["query"], item_break=False)
@@ -81,17 +32,17 @@ class ReadingParser:
 
         return "".join([self.parsed_reading, self.line_break])
 
-    def get_reading_as_map_history_record(self) -> dict:
+    def get_reading_as_map_history_record(self, unicode_mirroring=False) -> dict:
         map_record = {"hex_decimal": self.reading['result'][0]}
-        human_readable_timestamp = get_human_readable_timestamp(self.get_reading("timestamp"))
+        human_readable_timestamp = self.reading["timestamp"]
         map_record_content = {"timestamp": human_readable_timestamp, "query": self.reading["query"]}
 
         if self.reading.get('changing_lines'):
-            formatted_result = get_formatted_result(self.reading["result"], unicode_mirroring=False)
+            formatted_result = get_formatted_result(self.reading["result"], unicode_mirroring)
             map_record_content["result"] = formatted_result,
             map_record_content["changing_lines"] = self.reading['changing_lines']
 
-        map_record["content"] = OrderedDict(map_record_content)
+        map_record["content"] = map_record_content
         return map_record
 
     def get_printable_reading(self, full_text=False):
@@ -132,7 +83,10 @@ class ReadingParser:
             self._parse_lines(transformed)
 
     def _parse_lines(self, transformed: bool):
-        lines = self.reading.get("transformed_hexagram").get("lines") if transformed else self.reading.get("hexagram").get("lines")
+        if transformed:
+            lines = self.reading.get("transformed_hexagram").get("lines")
+        else:
+            lines = self.reading.get("hexagram").get("lines")
 
         for line_key, line_dictionary in lines.items():
             if line_key == "special_comment":

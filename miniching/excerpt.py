@@ -1,30 +1,10 @@
-import random
 import re
 from collections import OrderedDict
 
-from miniching.files import BINARY_TO_DECIMAL, DECIMAL_TO_BINARY
+from miniching.files import DECIMAL_TO_BINARY, BINARY_TO_DECIMAL
 
 
-def get_excerpt_with_coin_toss() -> str:
-    changing_lines = []
-    reversed_hex_binary = []
-
-    for line in range(1, 7):
-        coin_throw_sum = random.choice([2, 3]) + random.choice([2, 3]) + random.choice([2, 3])
-        reversed_hex_binary.append(0) if coin_throw_sum % 2 == 0 else reversed_hex_binary.append(1)
-        if coin_throw_sum == 6 or coin_throw_sum == 9:
-            changing_lines.append(line)
-
-    hex_binary_representation = "".join(str(line) for line in reversed_hex_binary[::-1])
-    hex_decimal = BINARY_TO_DECIMAL[hex_binary_representation]
-    if changing_lines:
-        changing_lines_representation = ",".join(str(line) for line in changing_lines)
-        return f"{hex_decimal}:{changing_lines_representation}"
-    else:
-        return str(hex_decimal)
-
-
-def get_decoded_excerpt(excerpt: str):
+def get_decoded_excerpt(excerpt: str) -> dict:
     if not re.match(r"\d{1,2}:(\d,){0,5}\d", excerpt) and not re.match(r"\d{1,2}", excerpt):
         raise ValueError("invalid excerpt format. use '64' for pure hexes or '64:1,2,3' for hexes with changing lines")
 
@@ -37,6 +17,7 @@ def get_decoded_excerpt(excerpt: str):
         changing_lines = [int(line) for line in changing_lines]
 
     hex_binary = [int(value) for value in list(DECIMAL_TO_BINARY[hex_decimal])]
+
     transformed_hex_binary = []
     if changing_lines:
         for position, line_value in zip(range(6, 0, -1), hex_binary):
@@ -58,6 +39,3 @@ def get_decoded_excerpt(excerpt: str):
         "changing_lines": changing_lines
     })
     return decoded_excerpt
-
-
-
