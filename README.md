@@ -1,6 +1,13 @@
 # miniching
 #### [Click here for a video demo](https://www.youtube.com/watch?v=K6esbD3UZlk)
 
+## IMPORTANT DISCLAIMER
+This version was created as a final project for Harvard's
+[CS50x](https://www.edx.org/course/introduction-computer-science-harvardx-cs50x) course.
+It works, but it's quite clunky - consider it pre-alpha.
+I decided to leave it here for a while for reference, but I DO NOT recommend using it.
+Check out the `main` branch instead.
+
 ---
 ## What is miniching?
 A console-friendly, minimalist I Ching package written in Python 3. It's most notable, unique feature is the map history
