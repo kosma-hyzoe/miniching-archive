@@ -1,8 +1,9 @@
 import random
 
-from miniching.files import BINARY_TO_DECIMAL
+from miniching.serialization import BINARY_TO_DECIMAL
 
 
+# todo implement the yarrow stalks method
 def get_excerpt_with_yarrow_stalks() -> str:
     pass
 

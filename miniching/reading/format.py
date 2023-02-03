@@ -1,40 +1,21 @@
-from miniching.files import REFERENCE
+from textwrap import wrap
+
+from miniching.serialization import get_config
+
+try:
+    _formats = dict(get_config().items("formats"))
+    WIDTH = _formats["width"]
+    LINE_BREAK = _formats["line_break"]
+    SECTION_BREAK = _formats["section_break"]
+    INITIAL_INDENT = _formats["initial_indent"]
+    INDENT = _formats["indent"]
+except:
+    WIDTH = 80
+    LINE_BREAK = "\n"
+    SECTION_BREAK = LINE_BREAK * 2
+    INITIAL_INDENT = ""
+    INDENT = 4 * " "
 
 
-# todo load format from config
 def format_datetime(datetime):
-    return datetime.strftime("%d-%m-%Y")
-
-
-def get_formatted_result(result, unicode_mirroring=True) -> str:
-    hex_decimal = result[0]
-    hex_sign = REFERENCE[hex_decimal]['sign']
-    if len(result) == 1:
-        result = f"{hex_decimal}"
-        if unicode_mirroring:
-            result += f" : {hex_sign}"
-    else:
-        transformed_hex_decimal = result[1]
-        transformed_hex_sign = REFERENCE[transformed_hex_decimal]['sign']
-        result = f"{hex_decimal} -> {transformed_hex_decimal}"
-        if unicode_mirroring:
-            result += f" : {hex_sign} -> {transformed_hex_sign}"
-    return result
-
-
-def get_formatted_title(title):
-    title_copy = title
-    if "(" in title:
-        title_copy = title[:title.index("(") - 1]
-    elif "[" in title:
-        title_copy = title[:title.index("[") - 1]
-    return f"'{title_copy}'"
-
-
-def get_formatted_line_heading(line):
-   pass 
-
-
-# todo pass title with no formatting and with unicode, delete unicode from result
-def get_formatted_hexagram_div():
-    pass
+    return datetime.strftime(_formats["timestamp"])

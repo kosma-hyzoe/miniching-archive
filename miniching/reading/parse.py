@@ -1,131 +1,118 @@
-from collections import OrderedDict
 from textwrap import wrap
 
-from miniching.reading.format import get_formatted_result, get_formatted_title
+from miniching.serialization import get_config, REFERENCE
+from miniching.reading.format import SECTION_BREAK, WIDTH, LINE_BREAK, INDENT, INITIAL_INDENT
+
+
+def format_result(result):
+    hex_decimal = result[0]
+    hex_sign = REFERENCE[hex_decimal]['sign']
+    if len(result) == 1:
+        result = f"{hex_decimal}"
+        if get_config()["formats"].getboolean("unicode_result_mirroring"):
+            result += f" : {hex_sign}"
+    else:
+        transformed_hex_decimal = result[1]
+        transformed_hex_sign = REFERENCE[transformed_hex_decimal]['sign']
+        result = f"{hex_decimal} -> {transformed_hex_decimal}"
+        if get_config()["formats"].getboolean("unicode_result_mirroring"):
+            result += f" : {hex_sign} -> {transformed_hex_sign}"
+
+    return result
+
+
+def format_hexagram_header(header):
+    if "(" in header:
+        header = header[:header.index("(") - 1]
+    elif "[" in header:
+        header = header[:header.index("[") - 1]
+
+    return header
 
 
 class ReadingParser:
-    width = 80
-    indent = " " * 4
-    line_break = "\n"
-    section_break = "\n" * 2
 
     def __init__(self, reading: dict):
-        self.parsed_reading = None
+        self.parsed_reading = []
         self.reading = reading
 
-    def get_reading_as_simple_history_record(self) -> str:
-        self.parsed_reading = ""
-
-        human_readable_timestamp = self.reading["timestamp"]
-        self._parse_section_divider(human_readable_timestamp, capitalize=False)
-
-        self._parse_section_content(self.reading["query"], item_break=False)
-
-        formatted_result = get_formatted_result(self.reading["result"])
-        self._parse_section_content(formatted_result)
+    def get_history_record(self) -> str:
+        history_record = [
+            f"{self.reading['timestamp']}\n",
+            f"{self.reading['query']}",
+            f"{format_result(self.reading['result'])}"
+        ]
 
         if self.reading.get("changing_lines"):
-            self._parse_section_content(self.reading["changing_lines"], item_break=False)
-        if self.reading.get("lines_to_read"):
-            self._parse_section_content(self.reading["lines_to_read"], item_break=False)
+            history_record.append(f"{self.reading['changing_lines']}")
 
-        return "".join([self.parsed_reading, self.line_break])
+        history_record.append('\n')
+        return "\n".join(history_record)
 
-    def get_reading_as_map_history_record(self, unicode_mirroring=False) -> dict:
-        map_record = {"hex_decimal": self.reading['result'][0]}
-        human_readable_timestamp = self.reading["timestamp"]
-        map_record_content = {"timestamp": human_readable_timestamp, "query": self.reading["query"]}
+    def get_printable_reading(self, full_text=False) -> str:
+        if not self.parsed_reading:
+            result = format_result(self.reading['result'])
 
-        if self.reading.get('changing_lines'):
-            formatted_result = get_formatted_result(self.reading["result"], unicode_mirroring)
-            map_record_content["result"] = formatted_result,
-            map_record_content["changing_lines"] = self.reading['changing_lines']
+            if full_text:
+                self._parse(result.center(WIDTH), SECTION_BREAK)
+                self._parse_hexagram_dictionary(self.reading["hexagram"])
 
-        map_record["content"] = map_record_content
-        return map_record
+                if self.reading.get("transformed_hexagram"):
+                    self._parse_hexagram_dictionary(self.reading["transformed_hexagram"])
 
-    def get_printable_reading(self, full_text=False):
-        self.parsed_reading = ""
+            else:
+                self._parse_summary_reading_item('result', result)
+                if self.reading.get("changing_lines"):
+                    self._parse_summary_reading_item("changing_lines", self.reading["changing_lines"])
+                if self.reading.get("lines_to_read"):
+                    self._parse_summary_reading_item("lines_to_read", self.reading["lines_to_read"])
 
-        self._parse_item_by_key("result", get_formatted_result(self.reading["result"]))
+        return "".join(self.parsed_reading)
 
-        if full_text:
-            self._parse_hexagrams()
+    def _parse(self, *values):
+        [self.parsed_reading.append(value) for value in values]
+
+    def _parse_header(self, header, capitalize=True, center=True):
+        header = header.replace("_", " ")
+        header = header.capitalize() if capitalize else header
+        header = header.center(WIDTH) if center else header + ":"
+
+        self._parse(header, SECTION_BREAK)
+
+    def _parse_summary_reading_item(self, key, value):
+        self._parse(f"{key.capitalize()}:{SECTION_BREAK}{INDENT}{value}{SECTION_BREAK}")
+
+    def _parse_text(self, text, preserve_line_breaks=False):
+        if preserve_line_breaks:
+            lines = text.split(LINE_BREAK)
+            indented_line_breaks = "".join([LINE_BREAK, INDENT])
+            self._parse(INDENT, indented_line_breaks.join(lines), SECTION_BREAK)
         else:
-            if self.reading.get("changing_lines"):
-                self._parse_item_by_key("changing_lines")
-            if self.reading.get("lines_to_read"):
-                self._parse_item_by_key("lines_to_read")
+            wrapped_text = wrap(text, width=WIDTH, initial_indent=INITIAL_INDENT)
+            formatted_text = LINE_BREAK.join(wrapped_text)
+            formatted_text += SECTION_BREAK
 
-        return self.parsed_reading
+            self._parse(formatted_text)
 
-    def _parse_hexagrams(self):
-        self._parse_hexagram_dictionary(transformed=False)
-
-        if self.reading.get("transformed_hexagram"):
-            self._parse_hexagram_dictionary(transformed=True)
-
-    def _parse_hexagram_dictionary(self, transformed: bool):
-        hexagram = self.reading["hexagram"] if not transformed else self.reading["transformed_hexagram"]
-
-        formatted_title = get_formatted_title(hexagram["title"])
-        self._parse_section_divider(formatted_title, capitalize=False)
-        self._parse_section_content(hexagram["intro"])
-
-        self._parse_section_content(hexagram["judgement"], preserve_line_breaks=True, double_indent=True)
-        self._parse_section_content(hexagram["commentary"])
-
-        self._parse_section_content(hexagram["image"], preserve_line_breaks=True, double_indent=True)
-        self._parse_section_content(hexagram["image_commentary"])
-
-        if hexagram.get("lines"):
-            self._parse_lines(transformed)
-
-    def _parse_lines(self, transformed: bool):
-        if transformed:
-            lines = self.reading.get("transformed_hexagram").get("lines")
-        else:
-            lines = self.reading.get("hexagram").get("lines")
-
+    def _parse_lines(self, lines):
         for line_key, line_dictionary in lines.items():
             if line_key == "special_comment":
-                self._parse_section_divider(line_key, capitalize=True, indent=True)
+                self._parse_header(line_key, capitalize=True)
             else:
-                formatted_line_key = " ".join(["Line ", str(line_key)])
-                self._parse_section_divider(formatted_line_key, capitalize=False, indent=True)
+                self._parse(INDENT, "Line ", str(line_key), ":", SECTION_BREAK)
 
-            self._parse_section_content(line_dictionary["text"], preserve_line_breaks=True, double_indent=True)
-            self._parse_section_content(line_dictionary["comment"])
+            self._parse_text(line_dictionary["text"], preserve_line_breaks=True)
+            self._parse_text(line_dictionary["comment"])
 
-    def _parse_item_by_key(self, key, alt_value=None):
-        self._parse_section_divider(key)
-        if alt_value:
-            self._parse_section_content(alt_value)
-        else:
-            self._parse_section_content(self.reading[key])
+    def _parse_hexagram_dictionary(self, hexagram):
+        self._parse_header(format_hexagram_header(hexagram["title"]))
+        self._parse_text(hexagram["intro"])
 
-    def _parse_section_divider(self, key, capitalize=True, indent=False):
-        formatted_key = "".join([str(key).replace("_", " "), ':'])
-        if capitalize:
-            formatted_key = formatted_key.capitalize()
-        if indent:
-            self.parsed_reading = "".join([self.parsed_reading, self.indent])
+        self._parse_text(hexagram["judgement"], preserve_line_breaks=True)
+        self._parse_text(hexagram["commentary"])
 
-        self.parsed_reading = "".join([self.parsed_reading, formatted_key, self.section_break])
+        self._parse_text(hexagram["image"], preserve_line_breaks=True)
+        self._parse_text(hexagram["image_commentary"])
 
-    def _parse_section_content(self, value, preserve_line_breaks=False, double_indent=False, item_break=True, width=width):
-        indent = (self.indent * 2) if double_indent else self.indent
-        if preserve_line_breaks:
-            value_lines = value.split(self.line_break)
-            self.parsed_reading = "".join([self.parsed_reading, indent])
-            joined_lines = ("".join([self.line_break, indent])).join(value_lines)
-            self.parsed_reading = "".join([self.parsed_reading, joined_lines])
-        else:
-            wrapped_value = wrap(value, width=width, initial_indent=indent, subsequent_indent=indent)
-            self.parsed_reading = "".join([self.parsed_reading, self.line_break.join(wrapped_value)])
-
-        if item_break:
-            self.parsed_reading = "".join([self.parsed_reading, self.section_break])
-        else:
-            self.parsed_reading = "".join([self.parsed_reading, self.line_break])
+        if hexagram.get("lines"):
+            self._parse_lines(hexagram.get("lines"))

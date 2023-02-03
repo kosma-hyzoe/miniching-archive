@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from miniching.excerpt import get_decoded_excerpt
-from miniching.files import REFERENCE, MODIFIED_ZHU_XI_LINE_EVALUATION
+from miniching.serialization import REFERENCE, MODIFIED_ZHU_XI_LINE_EVALUATION
 
 
 def compose_reading(excerpt: str, timestamp: str, query: str, classic: bool) -> dict:
@@ -48,11 +48,11 @@ def compose_reading(excerpt: str, timestamp: str, query: str, classic: bool) -> 
     elif not classic and len(changing_lines) == 4 or not classic and len(changing_lines) == 5:
         line_to_read = [line for line in range(1, 7) if line not in changing_lines][0]
         reading["transformed_hexagram"]["lines"] = {}
-        line_to_read = REFERENCE[transformed_hex_decimal]["lines"][line_to_read]
-        reading["transformed_hexagram"]["lines"][line_to_read] = line_to_read
-
-    lines_reference = REFERENCE[hex_decimal]["lines"]
-    reading["hexagram"]["lines"] = {}
-    [reading["hexagram"]["lines"].update({line: lines_reference[line]}) for line in changing_lines]
+        line_to_read_dict = REFERENCE[transformed_hex_decimal]["lines"][line_to_read]
+        reading["transformed_hexagram"]["lines"][line_to_read] = line_to_read_dict
+    else:
+        lines_reference = REFERENCE[hex_decimal]["lines"]
+        reading["hexagram"]["lines"] = {}
+        [reading["hexagram"]["lines"].update({line: lines_reference[line]}) for line in changing_lines]
 
     return reading
