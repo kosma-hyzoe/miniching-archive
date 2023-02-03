@@ -9,11 +9,11 @@ line selection, custom line evaluation and some extra features.
 
 1. Make sure Python 3 is installed. The project was developed on Python 3.10.6.
    Older and newer versions should also work, but were not tested.
-2. Install the requirements from `requirements.txt` 
+2. Install the requirements from `requirements.txt`
    (currently it only contains `pyyaml==6.0`)
 3. Navigate to where the `miniching` package is located
    (a `pip`-installable package coming soon)
-4. Modify the `config.ini` file if needed. Currently, it supports changing some 
+4. Modify the `config.ini` file if needed. Currently, it supports changing some
    formatting options and changing the path to the history file.
 5. Run `$ python3 -m miniching` in console with chosen flags/arguments.
 
@@ -34,7 +34,7 @@ options:
 ## What is I Ching?
 
 An ancient divination and wisdom book, easily one of, if not the most
-influential chinese text. Think jungian dream generator and Bible 
+influential chinese text. Think jungian dream generator and Bible
 studies for the cool kids or a less woo-woo Tarot.
 
 ### Isn't it still a bit esoteric and weird?
@@ -47,7 +47,7 @@ an average western intellectual. Here's his I Ching foreword at
 
 The user writes down a query (usually a question) and gets a result with one
 of the divination methods - usually tossing coins or arranging yarrow stalks
-(the latter coming soon). 
+(the latter coming soon).
 
 The main part of the text consists of 64 hexagrams.
 Their signs consist of six lines - yin ("unbroken") and yang ("broken") ones.
@@ -57,7 +57,7 @@ When tossing coins, each coin is assigned a value of 3 (usually "heads") or
 a "new" yin and yang and produce changing lines.
 
 The result to a query can either pe a "pure" hexagram, (i.e. 3 : ䷂) or a
-hexagram transition if one or more changing lines apply 
+hexagram transition if one or more changing lines apply
 (i.e. 3 -> 27 : ䷂ -> ䷚, where changing lines are 5th and 6th).
 The user should now read all of related text using preferred evaluation method.
 
