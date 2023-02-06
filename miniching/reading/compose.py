@@ -1,11 +1,11 @@
 from collections import OrderedDict
 
-from miniching.excerpt import get_decoded_excerpt
+from miniching.excerpt import get_hex_transition
 from miniching.serialization import REFERENCE, MODIFIED_ZHU_XI_LINE_EVALUATION
 
 
 def compose_reading(excerpt: str, timestamp: str, query: str, classic: bool) -> dict:
-    decoded_excerpt = get_decoded_excerpt(excerpt)
+    decoded_excerpt = get_hex_transition(excerpt)
     reading = OrderedDict({"timestamp": timestamp, "query": query})
 
     hex_decimal = decoded_excerpt["hex_decimal"]

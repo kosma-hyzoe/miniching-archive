@@ -1,11 +1,21 @@
 import re
 import sys
 from collections import OrderedDict
+from dataclasses import dataclass
 
 from miniching.serialization import DECIMAL_TO_BINARY, BINARY_TO_DECIMAL
 
 
-def get_decoded_excerpt(excerpt: str) -> dict:
+@dataclass(frozen=True)
+class HexTransition:
+    hex_decimal: int
+    hex_binary: list[int]
+    transformed_hex_decimal: int
+    transformed_hex_binary: list[int]
+    changing_lines: list[int]
+
+
+def get_hex_transition(excerpt: str) -> dict:
     if not re.match(r"\d{1,2}:(\d,){0,5}\d", excerpt) and not re.match(r"\d{1,2}", excerpt):
         print("Invalid excerpt format. use '64' for pure hexes or '64:1,2,3' for hexes with changing lines")
         sys.exit(1)
