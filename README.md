@@ -1,5 +1,13 @@
 # miniching
 
+## DEAR FUTURE EMPLOYER/HIRING MANAGER
+
+This passion project of mine has some spaghetti code, but not for long.
+You can track my progress in the `decent-typing` branch.
+
+Regards, 
+Kosma
+
 ## What is miniching?
 
 A console-friendly, minimalist I Ching library written in Python 3 with smart
