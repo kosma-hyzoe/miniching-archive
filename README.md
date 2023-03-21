@@ -7,6 +7,7 @@ You can track my progress in the `decent-typing` branch.
 
 
 Regards, 
+
 Kosma
 
 ## What is miniching?
