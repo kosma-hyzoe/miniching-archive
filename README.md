@@ -2,13 +2,10 @@
 
 ## DEAR FUTURE EMPLOYER/HIRING MANAGER
 
-This passion project of mine has some spaghetti code, but not for long.
+This passion project of mine still has some spaghetti code unfit for
+the front page of my GitHub, but not for long.
 You can track my progress in the `decent-typing` branch.
 
-
-Regards, 
-
-Kosma
 
 ## What is miniching?
 
