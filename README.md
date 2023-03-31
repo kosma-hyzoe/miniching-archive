@@ -17,6 +17,12 @@ line selection, custom line evaluation and some extra features.
    formatting options and changing the path to the history file.
 5. Run `$ python3 -m miniching` in console with chosen flags/arguments.
 
+### How does miniching work?
+
+#### Definitions
+
+
+
 ```
 options:
   -h, --help            show this help message and exit

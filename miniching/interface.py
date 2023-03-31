@@ -2,11 +2,11 @@ import argparse
 import sys
 from datetime import datetime
 
-from miniching.divination import get_excerpt_with_coin_toss
-from miniching.serialization import write_history, get_config
+from miniching import hexagrams, config
+from miniching.serialization import write_history
 from miniching.reading.compose import compose_reading
-from miniching.reading.format import format_datetime, LINE_BREAK
-from miniching.reading.parse import ReadingParser
+from miniching.reading.format import format_datetime
+from miniching.reading.parse import ReadingParser, LINE_BREAK
 
 
 def run():
@@ -25,11 +25,11 @@ def run():
         query = input("Query: ")
 
     if parser_args.excerpt:
-        excerpt = parser_args.excerpt
+        hexagram = hexagrams.get_from_excerpt(parser_args.excerpt)
     else:
-        excerpt = get_excerpt_with_coin_toss()
+        hexagram = hexagrams.get_with_coin_toss()
 
-    reading = compose_reading(excerpt, timestamp, query, parser_args.classic)
+    reading = compose_reading(hexagram, timestamp, query, parser_args.classic)
     reading_parser = ReadingParser(reading)
 
     if not parser_args.skip_print:
@@ -42,7 +42,7 @@ def run():
 
 def _check_timestamp(timestamp):
     try:
-        datetime.strptime(timestamp, get_config().get("formats", "timestamp"))
+        datetime.strptime(timestamp, config.TIMESTAMP_FORMAT)
     except ValueError as e:
         print("Error: " + str(e) + " provided in the config file.")
         sys.exit(1)
@@ -66,6 +66,10 @@ def _get_parser_args():
     parser.add_argument('-t', '--timestamp', type=str, default=None, help=timestamp_help)
 
     return parser.parse_args()
+
+
+if __name__ == '__main__':
+    run()
 
 
 

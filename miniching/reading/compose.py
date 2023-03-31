@@ -1,58 +1,40 @@
-from collections import OrderedDict
+import datetime
 
-from miniching.excerpt import get_hex_transition
-from miniching.serialization import REFERENCE, MODIFIED_ZHU_XI_LINE_EVALUATION
+from miniching.hexagrams import Hexagram
+from miniching.reading.models import HexagramText, Reading, LineText
+from miniching.serialization import REFERENCE
 
 
-def compose_reading(excerpt: str, timestamp: str, query: str, classic: bool) -> dict:
-    decoded_excerpt = get_hex_transition(excerpt)
-    reading = OrderedDict({"timestamp": timestamp, "query": query})
+def compose_reading(hexagram: Hexagram, timestamp: datetime.datetime, query: str, classic: bool) -> Reading:
+    # for hexagrams with no changing lines, just return the origin hexagram text
+    origin_text = HexagramText(REFERENCE[hexagram.origin]["title"], REFERENCE[hexagram.origin]["intro"],
+                               REFERENCE[hexagram.origin]["judgement"], REFERENCE[hexagram.origin]["commentary"],
+                               REFERENCE[hexagram.origin]["image"], REFERENCE[hexagram.origin]["image_commentary"])
+    if not hexagram.trans:
+        return Reading(timestamp, query, hexagram, origin_text, trans_text=None, lines_to_read=None)
 
-    hex_decimal = decoded_excerpt["hex_decimal"]
-    changing_lines = decoded_excerpt["changing_lines"]
-
-    hexagram_dict = {
-        "title": REFERENCE[hex_decimal]["title"],
-        "intro": REFERENCE[hex_decimal]["intro"],
-        "judgement": REFERENCE[hex_decimal]["judgement"],
-        "commentary": REFERENCE[hex_decimal]["commentary"],
-        "image": REFERENCE[hex_decimal]["image"],
-        "image_commentary": REFERENCE[hex_decimal]["image_commentary"],
-    }
-
-    if not changing_lines:
-        reading['result'] = tuple([hex_decimal])
-        reading["hexagram"] = hexagram_dict
-        return reading
-
-    transformed_hex_decimal = decoded_excerpt["transformed_hex_decimal"]
-    reading['result'] = tuple([hex_decimal, transformed_hex_decimal])
-
-    reading["changing_lines"] = ", ".join([str(line) for line in changing_lines])
-    if not classic:
-        reading["lines_to_read"] = MODIFIED_ZHU_XI_LINE_EVALUATION[len(changing_lines)]
-
-    reading["hexagram"] = hexagram_dict
-    reading["transformed_hexagram"] = {
-        "title": REFERENCE[transformed_hex_decimal]["title"],
-        "intro": REFERENCE[transformed_hex_decimal]["intro"],
-        "judgement": REFERENCE[transformed_hex_decimal]["judgement"],
-        "commentary": REFERENCE[transformed_hex_decimal]["commentary"],
-        "image": REFERENCE[transformed_hex_decimal]["image"],
-        "image_commentary": REFERENCE[transformed_hex_decimal]["image_commentary"],
-    }
-
-    if len(changing_lines) == 6 and hex_decimal == 1 or len(changing_lines) == 6 and hex_decimal == 2:
-        reading["hexagram"]["lines"] = {}
-        reading["hexagram"]["lines"]["special_comment"] = REFERENCE[hex_decimal]["lines"]["special"]
-    elif not classic and len(changing_lines) == 4 or not classic and len(changing_lines) == 5:
-        line_to_read = [line for line in range(1, 7) if line not in changing_lines][0]
-        reading["transformed_hexagram"]["lines"] = {}
-        line_to_read_dict = REFERENCE[transformed_hex_decimal]["lines"][line_to_read]
-        reading["transformed_hexagram"]["lines"][line_to_read] = line_to_read_dict
+    lines_to_read = []
+    lines_apply_to_trans = False
+    # special line comment edge case (hexagrams 1 and 2 with all 6 changing lines)
+    if (hexagram.origin == '1' or hexagram.trans == '1') and len(hexagram.changing_lines) == 6:
+        lines_to_read = [LineText("special", REFERENCE[hexagram.origin]["lines"]["special"]["text"],
+                                  REFERENCE[hexagram.origin]["lines"]["special"]["comment"])]
+        origin_text.lines = lines_to_read
+    # Read core text only with 6 changing lines
+    elif not classic and len(hexagram.changing_lines) == 6:
+        pass
+    # get lower, unchanging line when 4 or 5 changing lines
+    elif not classic and len(hexagram.changing_lines) > 3:
+        lines_apply_to_trans = True
+        line_to_read = [str(line) for line in range(1, 7) if line not in hexagram.changing_lines][0]
+        lines_to_read.append(LineText(line_to_read, REFERENCE[hexagram.trans]['lines'][line_to_read]["text"],
+                                      REFERENCE[hexagram.trans]['lines'][line_to_read]["text"]))
     else:
-        lines_reference = REFERENCE[hex_decimal]["lines"]
-        reading["hexagram"]["lines"] = {}
-        [reading["hexagram"]["lines"].update({line: lines_reference[line]}) for line in changing_lines]
+        for line in hexagram.changing_lines:
+            lines_to_read.append(LineText(line, REFERENCE[hexagram.origin]['lines'][line]["text"],
+                                          REFERENCE[hexagram.origin]['lines'][line]["text"]))
 
-    return reading
+    trans_text = HexagramText(REFERENCE[hexagram.trans]["title"], REFERENCE[hexagram.trans]["intro"],
+                              REFERENCE[hexagram.trans]["judgement"], REFERENCE[hexagram.trans]["commentary"],
+                              REFERENCE[hexagram.trans]["image"], REFERENCE[hexagram.trans]["image_commentary"])
+    return Reading(timestamp, query, hexagram, origin_text, trans_text, lines_to_read, lines_apply_to_trans)
