@@ -31,24 +31,24 @@ def get_with_coin_toss() -> Hexagram:
     for line in range(1, 7):
         coin_sum = random.choice([2, 3]) + random.choice([2, 3]) + random.choice([2, 3])
         if coin_sum == 7:
-            origin_binary.insert(0, '1')
-            trans_binary.insert(0, '1')
+            origin_binary.insert(0, "1")
+            trans_binary.insert(0, "1")
         elif coin_sum == 8:
-            origin_binary.insert(0, '0')
-            trans_binary.insert(0, '0')
+            origin_binary.insert(0, "0")
+            trans_binary.insert(0, "0")
         elif coin_sum == 9:
-            origin_binary.insert(0, '1')
-            trans_binary.insert(0, '0')
+            origin_binary.insert(0, "1")
+            trans_binary.insert(0, "0")
             changing_lines.append(str(line))
         elif coin_sum == 6:
-            origin_binary.insert(0, '0')
-            trans_binary.insert(0, '1')
+            origin_binary.insert(0, "0")
+            trans_binary.insert(0, "1")
             changing_lines.append(str(line))
 
     origin_decimal = BINARY_TO_DECIMAL["".join(origin_binary)]
     trans_decimal = BINARY_TO_DECIMAL["".join(trans_binary)]
 
-    return Hexagram(origin=origin_decimal, trans=trans_decimal, changing_lines=changing_lines)
+    return Hexagram(origin_decimal, trans_decimal, changing_lines)
 
 
 def get_from_excerpt(excerpt: str) -> Hexagram:
@@ -59,12 +59,14 @@ def get_from_excerpt(excerpt: str) -> Hexagram:
         trans_decimal = None
     # for excerpts with changing lines, in miniching notation
     elif re.match(r"^\d{1,2}:(\d,){0,5}\d$", excerpt):
-        origin_decimal = excerpt[:excerpt.index(":")]
-        changing_lines = excerpt[excerpt.index(":") + 1:].split(",")
+        origin_decimal = excerpt[: excerpt.index(":")]
+        changing_lines = excerpt[excerpt.index(":") + 1 :].split(",")
         origin_binary = [value for value in DECIMAL_TO_BINARY[origin_decimal]]
         trans_binary = []
-        for line, line_value in zip([str(line) for line in range(6, 0, -1)], origin_binary):
-            opposite_line_value = '1' if line_value == '0' else '0'
+        for line, line_value in zip(
+            [str(line) for line in range(6, 0, -1)], origin_binary
+        ):
+            opposite_line_value = "1" if line_value == "0" else "0"
             if line in changing_lines:
                 trans_binary.append(opposite_line_value)
             else:
@@ -75,29 +77,31 @@ def get_from_excerpt(excerpt: str) -> Hexagram:
         origin_binary = []
         trans_binary = []
         changing_lines = []
-        for coin_sum, line_number in zip(excerpt, [str(line) for line in range(6, 0, -1)]):
-            if coin_sum == '7':
-                origin_binary.append('1')
-                trans_binary.append('1')
-            elif coin_sum == '8':
-                origin_binary.append('0')
-                trans_binary.append('0')
-            elif coin_sum == '9':
-                origin_binary.append('1')
-                trans_binary.append('0')
+        for coin_sum, line_number in zip(
+            excerpt, [str(line) for line in range(6, 0, -1)]
+        ):
+            if coin_sum == "7":
+                origin_binary.append("1")
+                trans_binary.append("1")
+            elif coin_sum == "8":
+                origin_binary.append("0")
+                trans_binary.append("0")
+            elif coin_sum == "9":
+                origin_binary.append("1")
+                trans_binary.append("0")
                 changing_lines.append(line_number)
-            elif coin_sum == '6':
-                origin_binary.append('0')
-                trans_binary.append('1')
+            elif coin_sum == "6":
+                origin_binary.append("0")
+                trans_binary.append("1")
                 changing_lines.append(line_number)
 
         origin_decimal = BINARY_TO_DECIMAL["".join(origin_binary)]
         trans_decimal = BINARY_TO_DECIMAL["".join(trans_binary)]
     else:
-        raise ValueError("Invalid excerpt format. use '64' for pure hexagrams"
-                         " or '64:1,2,3' for hexagrams with changing lines."
-                         " Alternatively, use '3 coin sum' notation  – i.e. '788688' is the equivalent of '52:3'")
+        raise ValueError(
+            "Invalid excerpt format. use '64' for pure hexagrams"
+            " or '64:1,2,3' for hexagrams with changing lines."
+            " Alternatively, use '3 coin sum' notation  – i.e. '788688' is the equivalent of '52:3'"
+        )
 
-    return Hexagram(origin=origin_decimal, trans=trans_decimal, changing_lines=changing_lines)
-
-
+    return Hexagram(origin_decimal, trans_decimal, changing_lines)

@@ -3,18 +3,21 @@ from miniching.serialization import REFERENCE
 
 
 def get_result(hexagram):
-    origin_sign = REFERENCE[hexagram.origin]['sign']
     if not hexagram.trans:
         result = f"{hexagram.origin}"
-        if config.UNICODE_HEXAGRAM_MIRROR:
-            result += f" | {origin_sign}"
     else:
-        trans_sign = REFERENCE[hexagram.origin]['sign']
         result = f"{hexagram.origin}:{','.join(hexagram.changing_lines)} -> {hexagram.trans}"
-        if config.UNICODE_HEXAGRAM_MIRROR:
-            result += f" | {origin_sign} -> {trans_sign}"
 
     return result
+
+
+def get_unicode_hexagram_result(hexagram):
+    origin_sign = REFERENCE[hexagram.origin]['sign']
+    if not hexagram.trans:
+        return origin_sign
+    else:
+        trans_sign = REFERENCE[hexagram.origin]['sign']
+        return f"{origin_sign} -> {trans_sign}"
 
 
 def format_datetime(datetime):
