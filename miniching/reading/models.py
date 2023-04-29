@@ -4,6 +4,11 @@ from typing import NamedTuple, Optional, List
 from miniching.hexagrams import Hexagram
 
 
+class HistoryRecord(NamedTuple):
+    timestamp: datetime
+    query: str
+    result: str
+
 class LineText(NamedTuple):
     line: str
     text: str
@@ -25,5 +30,5 @@ class Reading(NamedTuple):
     hexagram: Hexagram
     origin_text: HexagramText
     trans_text: Optional[HexagramText]
-    lines_to_read: Optional[List[LineText]]
-    lines_apply_to_trans: bool
+    lines_to_read: List[LineText]
+    trans_lines: bool

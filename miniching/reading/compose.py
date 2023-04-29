@@ -1,12 +1,13 @@
 import datetime
+from miniching.hexagrams import Hexagram
 
 from miniching.reading.models import HexagramText, Reading, LineText
-from miniching.serialization import REFERENCE
+from miniching.reference import REFERENCE
 
 
-def compose(hexagram, timestamp, query, classic):
+def compose(hexagram: Hexagram, timestamp, query):
     # for hexagrams with no changing lines, just return the origin hexagram text
-    origin_text = HexagramText(
+    origin_t = HexagramText(
         REFERENCE[hexagram.origin]["title"],
         REFERENCE[hexagram.origin]["intro"],
         REFERENCE[hexagram.origin]["judgement"],
@@ -15,48 +16,31 @@ def compose(hexagram, timestamp, query, classic):
         REFERENCE[hexagram.origin]["image_commentary"],
     )
     if not hexagram.trans:
-        return Reading(
-            timestamp,
-            query,
-            hexagram,
-            origin_text,
-            None,
-            None,
-            lines_apply_to_trans=False,
-        )
+        return Reading(timestamp, query, hexagram, origin_t, None, [], False)
 
     lines_to_read = []
-    lines_apply_to_trans = False
     # special line comment edge case (hexagrams 1 and 2 with all 6 changing lines)
-    if (hexagram.origin == "1" or hexagram.trans == "1") and len(
-        hexagram.changing_lines
-    ) == 6:
-        lines_to_read = [
-            LineText(
-                "special",
-                REFERENCE[hexagram.origin]["lines"]["special"]["text"],
-                REFERENCE[hexagram.origin]["lines"]["special"]["comment"],
-            )
-        ]
-        origin_text.lines = lines_to_read
+    if hexagram.origin in ["1", "2"] and len(hexagram.chanlines) == 6: # type: ignore
+        lines_to_read = [LineText("special",
+                                  REFERENCE[hexagram.origin]["lines"]["special"]["text"],
+                                  REFERENCE[hexagram.origin]["lines"]["special"]["comment"],
+                                  )
+                         ]
+        origin_t.lines = lines_to_read
     # Read core text only with 6 changing lines
-    elif not classic and len(hexagram.changing_lines) == 6:
+    elif not hexagram.classic_eval and len(hexagram.chanlines) == 6: # type: ignore
         pass
     # get lower, unchanging line when 4 or 5 changing lines
-    elif not classic and len(hexagram.changing_lines) > 3:
-        lines_apply_to_trans = True
-        line_to_read = [
-            str(line) for line in range(1, 7) if line not in hexagram.changing_lines
-        ][0]
-        lines_to_read.append(
-            LineText(
-                line_to_read,
-                REFERENCE[hexagram.trans]["lines"][line_to_read]["text"],
-                REFERENCE[hexagram.trans]["lines"][line_to_read]["text"],
-            )
-        )
+    elif not hexagram.classic_eval and len(hexagram.chanlines) > 3:
+        l = [str(l) for l in range(1, 7) if str(
+            l) not in hexagram.chanlines][0]
+        trans_lines = True
+        lines_to_read.append(LineText(l, REFERENCE[hexagram.trans]["lines"][l]["text"],
+                                      REFERENCE[hexagram.trans]["lines"][l]["text"],
+                                      )
+                             )
     else:
-        for line in hexagram.changing_lines:
+        for line in hexagram.chanlines:
             lines_to_read.append(
                 LineText(
                     line,
@@ -77,8 +61,8 @@ def compose(hexagram, timestamp, query, classic):
         timestamp,
         query,
         hexagram,
-        origin_text,
+        origin_t,
         trans_text,
         lines_to_read,
-        lines_apply_to_trans,
+        trans_lines,
     )

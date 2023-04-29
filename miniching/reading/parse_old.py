@@ -31,12 +31,12 @@ class ReadingParser:
             return "".join(self.parsed_reading)
 
         result = get_result(self.reading.hexagram)
-        if config.UNICODE_HEXAGRAM_MIRROR:
+        if config.HEX_MIRROR:
             result = " | ".join([result, get_unicode_hexagram_result(self.reading.hexagram)])
         if full_text:
             self._parse(result.center(WIDTH), SECTION_BREAK)
 
-            if self.reading.trans_text and self.reading.lines_apply_to_trans:
+            if self.reading.trans_text and self.reading.trans_lines:
                 self._parse_hexagram_text(self.reading.origin_text)
                 self._parse_hexagram_text(self.reading.trans_text, self.reading.lines_to_read)
             elif self.reading.trans_text:
@@ -60,10 +60,10 @@ class ReadingParser:
 
     def get_summary_result(self):
         result = SECTION_BREAK
-        if self.reading.lines_apply_to_trans:
+        if self.reading.trans_lines:
             result = "".join([result, self.reading.hexagram.origin, " -> ", self.reading.hexagram.trans, ":",
                               ','.join([line_to_read.line for line_to_read in self.reading.lines_to_read])])
-            if config.UNICODE_HEXAGRAM_MIRROR:
+            if config.HEX_MIRROR:
                 # todo
                 result = " | ".join([result, f"{self.reading.hexagram.origin}"])
             return f"{SECTION_BREAK}{self.reading.hexagram.origin} -> {self.reading.hexagram.trans}" \
