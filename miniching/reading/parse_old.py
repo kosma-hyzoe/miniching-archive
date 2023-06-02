@@ -1,7 +1,7 @@
 from textwrap import wrap
 
 from miniching import config
-from miniching.reading.format import get_result, format_hexagram_header, get_unicode_hexagram_result
+from miniching.reading.helpers import get_result, format_hexagram_header, get_unicode_hexagram_result
 from miniching.reading.models import Reading
 
 WIDTH = 80

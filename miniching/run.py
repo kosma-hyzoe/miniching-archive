@@ -4,7 +4,7 @@ from datetime import datetime
 
 from miniching import hexagrams, config
 from miniching.reading.compose import compose
-from miniching.reading.format import format_timestamp
+from miniching.reading.helpers import format_timestamp
 from miniching.reading.parse_old import ReadingParser, LINE_BREAK
 
 

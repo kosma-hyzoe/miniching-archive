@@ -3,7 +3,7 @@ from textwrap import wrap
 from miniching.config import WIDTH, LINE_BREAK, SECTION_BREAK, INDENT
 from miniching.config import HISTORY_PATH 
 
-from miniching.reading.format import get_result
+from miniching.reading.helpers import get_result
 from miniching.reading.models import Reading
 
 
