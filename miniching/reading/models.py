@@ -1,13 +1,26 @@
 from datetime import datetime
 from typing import NamedTuple, Optional, List
 
-from miniching.hexagrams import Hexagram
+
+class Hexagram(NamedTuple):
+    origin: str
+    trans: Optional[str]
+    lines: list[str]
+    classic_eval: bool
+
+    # effectively returns a miniching notation excerpt
+    def __str__(self):
+        if self.lines:
+            return f"{self.origin}:{','.join(self.lines)}"
+        else:
+            return self.origin
 
 
 class HistoryRecord(NamedTuple):
     timestamp: datetime
     query: str
     result: str
+
 
 class LineText(NamedTuple):
     line: str

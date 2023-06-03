@@ -9,5 +9,5 @@ default_history_dir = os.path.expanduser('~')
 
 HISTORY_PATH: str = r""
 
-TIMESTAMP_FORMAT = r"%d-%m-%Y"
+TIMESTAMP_FORMAT = r"%d-%m-%Y %-H:%M"
 HEX_MIRROR: bool = True

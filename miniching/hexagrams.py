@@ -1,27 +1,13 @@
 import re
 from random import choice
-from typing import NamedTuple, Optional
 
+from miniching.reading.models import Hexagram
 from miniching.reference import DECIMAL_TO_BINARY, BINARY_TO_DECIMAL
 
 VALUE_ERROR_MSG = "Invalid excerpt format. use '64' for pure hexagrams" \
                   " or '64:1,2,3' for hexagrams with changing lines." \
                   " Alternatively, use '3 coin sum' notation  - i.e. '788688'" \
                   " is the equivalent of '52:3'"
-
-
-class Hexagram(NamedTuple):
-    origin: str
-    trans: Optional[str]
-    chanlines: list[str]
-    classic_eval: bool
-
-    # effectively returns a miniching notation excerpt
-    def __str__(self):
-        if self.chanlines:
-            return f"{self.origin}:{','.join(self.chanlines)}"
-        else:
-            return self.origin
 
 
 def get_with_coin_toss(classic_eval: bool) -> Hexagram:
