@@ -4,6 +4,11 @@ from typing import NamedTuple, Optional
 
 from miniching.reference import DECIMAL_TO_BINARY, BINARY_TO_DECIMAL
 
+VALUE_ERROR_MSG = "Invalid excerpt format. use '64' for pure hexagrams" \
+                  " or '64:1,2,3' for hexagrams with changing lines." \
+                  " Alternatively, use '3 coin sum' notation  - i.e. '788688'" \
+                  " is the equivalent of '52:3'"
+
 
 class Hexagram(NamedTuple):
     origin: str
@@ -63,9 +68,9 @@ def get_from_excerpt(excerpt: str, classic_eval: bool) -> Hexagram:
         chanlines = excerpt[excerpt.index(":") + 1:].split(",")
         origin_binary = [value for value in DECIMAL_TO_BINARY[origin]]
         trans_binary = []
-        for line, line_value in zip(
-            [str(line) for line in range(6, 0, -1)], origin_binary
-        ):
+        zip_lines = zip([str(line) for line in range(6, 0, -1)], origin_binary)
+
+        for line, line_value in zip_lines:
             opposite_line_value = "1" if line_value == "0" else "0"
             if line in chanlines:
                 trans_binary.append(opposite_line_value)
@@ -97,9 +102,5 @@ def get_from_excerpt(excerpt: str, classic_eval: bool) -> Hexagram:
         origin = BINARY_TO_DECIMAL["".join(origin_binary)]
         trans = BINARY_TO_DECIMAL["".join(trans_binary)]
     else:
-        raise ValueError(
-            "Invalid excerpt format. use '64' for pure hexagrams"
-            " or '64:1,2,3' for hexagrams with changing lines."
-            " Alternatively, use '3 coin sum' notation  - i.e. '788688' is the equivalent of '52:3'"
-        )
+        raise ValueError(VALUE_ERROR_MSG)
     return Hexagram(origin, trans, chanlines, classic_eval)
