@@ -1,12 +1,5 @@
 # miniching
 
-## DEAR FUTURE EMPLOYER/HIRING MANAGER
-
-This passion project of mine still has some spaghetti code unfit for
-the front page of my GitHub, but not for long.
-You can track my progress in the `decent-typing` branch.
-
-
 ## What is miniching?
 
 A CLI-friendly, customizable I Ching tool with smart line selection,
@@ -33,7 +26,7 @@ alias ccng="mcng --write-history --classic-eval"
 pcng() {mcng $1 | less}
 ```
 
-Use `mcng -h` to see the options:
+Use `mcng -h` to see the list of possible command line arguments:
 
 ```
 usage: mcng [-h] [-c] [-f] [-w] [-s] [-q QUERY] [-e EXCERPT] [-t TIMESTAMP]
