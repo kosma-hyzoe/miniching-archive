@@ -4,11 +4,10 @@ from typing import NamedTuple, Optional, List
 
 class Hexagram(NamedTuple):
     origin: str
-    trans: Optional[str]
-    lines: list[str]
-    classic_eval: bool
+    trans: Optional[str] = None
+    lines: list[str] = []
+    classic_eval: bool = False
 
-    # effectively returns a miniching notation excerpt
     def __str__(self):
         if self.lines:
             return f"{self.origin}:{','.join(self.lines)}"
@@ -44,4 +43,4 @@ class Reading(NamedTuple):
     origin_text: HexagramText
     trans_text: Optional[HexagramText]
     lines_to_read: List[LineText]
-    trans_lines: bool
+    trans_lines: bool = False
