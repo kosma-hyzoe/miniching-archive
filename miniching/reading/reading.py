@@ -27,7 +27,6 @@ def write_history(reading: Reading):
         path = os.path.join(_DEFAULT_HISTORY_DIR, HISTORY_FILENAME)
     elif not os.path.isfile(rc.HISTORY_PATH):
         path = os.path.join(rc.HISTORY_PATH, HISTORY_FILENAME)
-
     else:
         path = rc.HISTORY_PATH
 

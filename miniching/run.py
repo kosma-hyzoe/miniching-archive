@@ -8,6 +8,8 @@ from miniching.reading.compose import compose
 from miniching.reading.helpers import get_result
 from miniching.reading.reading import get_printable_reading, write_history
 
+
+
 H_CLASSIC = "use classic evaluation / 'read all changing lines' instead of " \
             "the default modified Zhu Xi method"
 H_FULL_READING = "get a full reading instead of just the hexagram transition " \
@@ -38,8 +40,11 @@ def run():
             with open(args.history_path, 'w'):
                 pass
         except OSError:
-            print(E_HISTORY_PATH, file=sys.stderr)
-            sys.exit(1)
+            if os.path.exists(args.history_path):
+                 config.HISTORY_PATH = os.path.join(args.history_path, "")
+            else:
+                print(E_HISTORY_PATH, file=sys.stderr)
+                sys.exit(1)
         else:
             config.HISTORY_PATH = args.history_path
 
