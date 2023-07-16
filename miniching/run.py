@@ -24,7 +24,7 @@ H_EXCERPT = "provide an excerpt using '64' /'61:1,2' or the " \
 H_TIMESTAMP = "provide a timestamp, any format"
 H_HISTORY_PATH = "provide an alternative history path."
 
-E_HISTORY_PATH = "Error: provided path doesn't exist"
+E_HISTORY_PATH = "Error: provided path is invalid"
 
 
 def run():
