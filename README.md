@@ -37,7 +37,7 @@ options:
   -f, --full-reading    get a full reading instead of just the hexagram
                         transition result
   -w, --write-history   write history to a txt file using the specified path
-                        (config.py or command or `-p` argument).will attempt
+                        (config.py or command or `-p` argument). will attempt
                         to write in $HOME if no path was specified
   -s, --skip-print      don't print the reading
   -q QUERY, --query QUERY

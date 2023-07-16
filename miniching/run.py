@@ -15,7 +15,7 @@ H_CLASSIC = "use classic evaluation / 'read all changing lines' instead of " \
 H_FULL_READING = "get a full reading instead of just the hexagram transition " \
                   "result"
 H_WRITE_HISTORY = "write history to a txt file using the specified "\
-                  "path (config.py or command or `-p` argument)."\
+                  "path (config.py or command or `-p` argument). "\
                   "will attempt to write in $HOME if no path was specified"
 H_SKIP_PRINT = "don't print the reading"
 H_QUERY = "provide a query instead of using the default prompt"
