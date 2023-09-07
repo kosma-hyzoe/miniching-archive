@@ -1,5 +1,5 @@
 from context import miniching
-import pytest
+# import pytest
 from miniching import hexagrams
 
 

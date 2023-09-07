@@ -8,7 +8,7 @@ def compose(hexagram: Hexagram, timestamp, query):
     # for hexagrams with no changing lines, just return the origin hexagram text
     origin_text = _compose_hex_text(hexagram, trans=False)
     if not hexagram.trans:
-        return Reading(timestamp, query, hexagram, origin_text, None, [], False)
+        return Reading(timestamp, query, hexagram, origin_text, None, [])
 
     trans_lines = False
     lines_to_read = []
@@ -22,8 +22,8 @@ def compose(hexagram: Hexagram, timestamp, query):
     # get lower, unchanging line when 4 or 5 changing lines
     elif not hexagram.classic_eval and len(hexagram.lines) > 3:
         line = [str(l) for l in range(1, 7) if str(l) not in hexagram.lines][0]
-        _append_line_to_read(lines_to_read, hexagram, line)
         trans_lines = True
+        _append_line_to_read(lines_to_read, hexagram, line, trans_lines)
     else:
         for line in hexagram.lines:
             _append_line_to_read(lines_to_read, hexagram, line)
@@ -33,14 +33,18 @@ def compose(hexagram: Hexagram, timestamp, query):
                    lines_to_read, trans_lines)
 
 
-def _append_line_to_read(lines_to_read, hexagram, line):
+def _append_line_to_read(lines_to_read, hexagram, line, trans_lines=False):
     if line == 's':
         text = REFERENCE[hexagram.origin]["lines"]["special"]["text"]
         comment = REFERENCE[hexagram.origin]["lines"]["special"]["comment"]
         lines_to_read.append(LineText("Special", text, comment))
-    else:
+    elif trans_lines:
         text = REFERENCE[hexagram.trans]["lines"][line]["text"]
         comment = REFERENCE[hexagram.trans]["lines"][line]["comment"]
+        lines_to_read.append(LineText(line, text, comment))
+    else:
+        text = REFERENCE[hexagram.origin]["lines"][line]["text"]
+        comment = REFERENCE[hexagram.origin]["lines"][line]["comment"]
         lines_to_read.append(LineText(line, text, comment))
 
 
