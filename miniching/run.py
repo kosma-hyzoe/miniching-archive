@@ -8,16 +8,15 @@ from miniching.reading.compose import compose
 from miniching.reading.helpers import get_result
 from miniching.reading.reading import get_printable_reading, write_history
 
-
-
 H_CLASSIC = "use classic evaluation / 'read all changing lines' instead of " \
-            "the default modified Zhu Xi method"
-H_FULL_READING = "get a full reading instead of just the hexagram transition " \
+        "the default modified Zhu Xi method"
+H_FULL_READING = "get full reading instead of just the hexagram transition " \
                   "result"
 H_WRITE_HISTORY = "write history to a txt file using the specified "\
-                  "path (config.py or command or `-p` argument). "\
+                  "path (config.py or command or -p flag). "\
                   "will attempt to write in $HOME if no path was specified"
-H_SKIP_PRINT = "don't print the reading"
+H_SKIP_WRITE = "don't write to history path, even if -w or -p flags were" \
+        "provided"
 H_QUERY = "provide a query instead of using the default prompt"
 H_EXCERPT = "provide an excerpt using '64' /'61:1,2' or the " \
             "3 coin sum notation ('788688' -> 23:3)"
@@ -41,7 +40,7 @@ def run():
                 pass
         except OSError:
             if os.path.exists(args.history_path):
-                 config.HISTORY_PATH = os.path.join(args.history_path, "")
+                config.HISTORY_PATH = os.path.join(args.history_path, "")
             else:
                 print(E_HISTORY_PATH, file=sys.stderr)
                 sys.exit(1)
@@ -57,12 +56,12 @@ def run():
 
     reading = compose(hexagram, timestamp, query)
 
-    if not args.skip_print:
-        if args.full_reading:
-            print(get_printable_reading(reading), end="")
-        else:
-            print(get_result(reading.hexagram, center=False))
-    if args.write_history or args.history_path:
+    if args.full_reading:
+        print(get_printable_reading(reading), end="")
+    else:
+        print(get_result(reading.hexagram, center=False))
+
+    if args.write_history or args.history_path and not args.skip_write:
         write_history(reading)
 
 
@@ -73,8 +72,8 @@ def _get_parser_args():
                         help=H_FULL_READING)
     parser.add_argument("-w", "--write-history", action="store_true",
                         help=H_WRITE_HISTORY)
-    parser.add_argument("-s", "--skip-print", action="store_true",
-                        help=H_SKIP_PRINT)
+    parser.add_argument("-s", "--skip-write", action="store_true",
+                        help=H_SKIP_WRITE)
     parser.add_argument("-q", "--query", type=str, default=None, help=H_QUERY)
     parser.add_argument("-e", "--excerpt", type=str, default=None,
                         help=H_EXCERPT)
@@ -83,4 +82,3 @@ def _get_parser_args():
     parser.add_argument("-p", "--history-path", type=str, default=None,
                         help=H_HISTORY_PATH)
     return parser.parse_args()
-
