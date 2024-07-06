@@ -1,11 +1,11 @@
 import sys
 from datetime import datetime
-from miniching import config as rc
 from miniching.hexagrams import Hexagram
 from miniching.reference import REFERENCE
 
 
-def get_result(hexagram: Hexagram, center: bool = True):
+def get_result(hexagram: Hexagram,
+               center: bool = True, hex_mirror: bool = False):
     result = f"{hexagram.origin}"
 
     if hexagram.lines:
@@ -15,14 +15,14 @@ def get_result(hexagram: Hexagram, center: bool = True):
         else:
             result += f":{','.join(hexagram.lines)} -> {hexagram.trans}"
 
-        if rc.HEX_MIRROR:
+        if hex_mirror:
             result += f" : {REFERENCE[hexagram.origin]['sign']}" \
                       f" -> {REFERENCE[hexagram.trans]['sign']}"
     else:
-        if rc.HEX_MIRROR:
+        if hex_mirror:
             result += f" : {REFERENCE[hexagram.origin]['sign']}"
 
-    return result.center(rc.WIDTH) if center else result
+    return result.center(WIDTH) if center else result
 
 
 def get_line_to_read_4_or_5_changing_lines(lines: list[str]):

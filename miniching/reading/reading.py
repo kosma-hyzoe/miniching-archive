@@ -1,30 +1,33 @@
 import os
 from textwrap import wrap
-from miniching import config as rc
 
 from miniching.reading.helpers import get_result, format_hexagram_title
 from miniching.reading.models import Reading, HexagramText, LineText
+from miniching.run import HISTORY_FILENAME, WIDTH
 
-_DEFAULT_HISTORY_DIR = os.environ["HOME"]
-HISTORY_FILENAME = "iching-history.txt"
+LINE_BREAK = "\n"
+SECTION_BREAK = "\n\n"
+INDENT = "\t"
+
+
 _reading_sections = []
 
 
 def write_history(reading: Reading):
     record = []
 
-    record.append(f"{str(reading.timestamp).center(rc.WIDTH)}")
+    record.append(str(reading.timestamp))
 
-    if len(reading.query) > rc.WIDTH:
-        record.append(rc.LINE_BREAK.join(wrap(reading.query.center(
-                      rc.WIDTH), rc.WIDTH)))
+    if len(reading.query) > WIDTH:
+        record.append(LINE_BREAK.join(wrap(reading.query.center(
+                      WIDTH), WIDTH)))
     else:
         record.append(reading.query.center(rc.WIDTH))
 
     record.append(get_result(reading.hexagram))
 
-    if not rc.HISTORY_PATH:
-        path = os.path.join(_DEFAULT_HISTORY_DIR, HISTORY_FILENAME)
+    if not HISTORY_PATH:
+        path = os.path.join(DEFAULT_HISTORY_DIR, HISTORY_FILENAME)
     elif not os.path.isfile(rc.HISTORY_PATH):
         path = os.path.join(rc.HISTORY_PATH, HISTORY_FILENAME)
     else:
