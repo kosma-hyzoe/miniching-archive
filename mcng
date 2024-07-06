@@ -6,4 +6,6 @@ if __name__ == "__main__":
     try:
         run()
     except EOFError:
-        exit(0)
+        exit(1)
+    except KeyboardInterrupt:
+        exit(1)
