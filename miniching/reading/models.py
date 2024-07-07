@@ -1,4 +1,6 @@
 from datetime import datetime
+from miniching import config as rc
+from textwrap import wrap
 from typing import NamedTuple, Optional, List
 
 
@@ -6,7 +8,7 @@ class Hexagram(NamedTuple):
     origin: str
     trans: Optional[str] = None
     lines: list[str] = []
-    classic_eval: bool = False
+    zhu_xi_eval: bool = False
 
     def __str__(self):
         if self.lines:
@@ -19,6 +21,12 @@ class HistoryRecord(NamedTuple):
     timestamp: datetime
     query: str
     result: str
+
+    def __str__(self):
+        return "\n".join([
+            self.timestamp,
+            self.query,
+            self.result])
 
 
 class LineText(NamedTuple):

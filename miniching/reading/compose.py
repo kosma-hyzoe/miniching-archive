@@ -4,7 +4,7 @@ from miniching.reading.models import HexagramText, Reading, LineText
 from miniching.reference import REFERENCE
 
 
-def compose(hexagram: Hexagram, timestamp, query):
+def compose(hexagram: Hexagram, timestamp, query) -> Reading:
     # for hexagrams with no changing lines, just return the origin hexagram text
     origin_text = _compose_hex_text(hexagram, trans=False)
     if not hexagram.trans:
@@ -17,10 +17,10 @@ def compose(hexagram: Hexagram, timestamp, query):
     if hexagram.origin in ["1", "2"] and len(hexagram.lines) == 6:
         _append_line_to_read(lines_to_read, hexagram, "s")
     # Read core text only with 6 changing lines
-    elif not hexagram.classic_eval and len(hexagram.lines) == 6:
+    elif hexagram.zhu_xi_eval and len(hexagram.lines) == 6:
         pass
     # get lower, unchanging line when 4 or 5 changing lines
-    elif not hexagram.classic_eval and len(hexagram.lines) > 3:
+    elif hexagram.zhu_xi_eval and len(hexagram.lines) > 3:
         line = [str(l) for l in range(1, 7) if str(l) not in hexagram.lines][0]
         trans_lines = True
         _append_line_to_read(lines_to_read, hexagram, line, trans_lines)

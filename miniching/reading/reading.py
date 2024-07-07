@@ -1,45 +1,14 @@
-import os
 from textwrap import wrap
 
-from miniching.reading.helpers import get_result, format_hexagram_title
+from miniching.reading.helpers import format_hexagram_title
 from miniching.reading.models import Reading, HexagramText, LineText
-from miniching.run import HISTORY_FILENAME, WIDTH
-
-LINE_BREAK = "\n"
-SECTION_BREAK = "\n\n"
-INDENT = "\t"
-
+from miniching import config as rc
 
 _reading_sections = []
 
 
-def write_history(reading: Reading):
-    record = []
-
-    record.append(str(reading.timestamp))
-
-    if len(reading.query) > WIDTH:
-        record.append(LINE_BREAK.join(wrap(reading.query.center(
-                      WIDTH), WIDTH)))
-    else:
-        record.append(reading.query.center(rc.WIDTH))
-
-    record.append(get_result(reading.hexagram))
-
-    if not HISTORY_PATH:
-        path = os.path.join(DEFAULT_HISTORY_DIR, HISTORY_FILENAME)
-    elif not os.path.isfile(rc.HISTORY_PATH):
-        path = os.path.join(rc.HISTORY_PATH, HISTORY_FILENAME)
-    else:
-        path = rc.HISTORY_PATH
-
-    with open(path, "a+") as f:
-        f.write(rc.SECTION_BREAK.join(record))
-        f.write(rc.SECTION_BREAK + rc.LINE_BREAK)
-
-
-def get_printable_reading(reading: Reading) -> str:
-    _reading_sections.extend([get_result(reading.hexagram), rc.SECTION_BREAK])
+def get_full_reading(reading: Reading, result) -> str:
+    _reading_sections.extend([result.center(rc.WIDTH), rc.SECTION_BREAK])
 
     if reading.trans_text and reading.trans_lines:
         _parse_hexagram(reading.origin_text)
@@ -89,9 +58,10 @@ def _parse_text(text, preserve_line_breaks=False):
     if preserve_line_breaks:
         indented_line_breaks = "".join([rc.LINE_BREAK, rc.INDENT])
         text_lines = text.split(rc.LINE_BREAK)
-        _reading_sections.extend([rc.INDENT,
-                                  indented_line_breaks.join(text_lines),
-                                  rc.SECTION_BREAK])
+        _reading_sections.extend([
+            rc.INDENT,
+            indented_line_breaks.join(text_lines),
+            rc.SECTION_BREAK])
     else:
         wrapped_text = wrap(text, width=rc.WIDTH)
         formatted_text = rc.LINE_BREAK.join(wrapped_text)

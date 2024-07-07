@@ -5,11 +5,12 @@ from random import choice
 from miniching.reading.models import Hexagram
 from miniching.reference import DECIMAL_TO_BINARY, BINARY_TO_DECIMAL
 
-VALUE_ERROR_MSG = "Invalid excerpt format.\nUse '23'/ '23:3' format or the " \
-                  "3 coin sum notation ('788688' -> 23:3)"
+E_EXCERPT = \
+    "Invalid excerpt format.\n" \
+    "Use '23'/ '23:3' format or 3-coin sum notation ('788688' -> 23:3)"
 
 
-def get_with_coin_toss(classic_eval: bool) -> Hexagram:
+def get_with_coin_toss(zhu_xi_eval: bool) -> Hexagram:
     changing_lines: list[str] = []
     origin_binary: list[str] = []
     trans_binary: list[str] = []
@@ -38,7 +39,7 @@ def get_with_coin_toss(classic_eval: bool) -> Hexagram:
 
     origin_decimal = BINARY_TO_DECIMAL["".join(origin_binary)]
     trans_decimal = BINARY_TO_DECIMAL["".join(trans_binary)]
-    return Hexagram(origin_decimal, trans_decimal, changing_lines, classic_eval)
+    return Hexagram(origin_decimal, trans_decimal, changing_lines, zhu_xi_eval)
 
 
 def get_from_excerpt(excerpt: str, classic_eval: bool) -> Hexagram:
@@ -49,7 +50,7 @@ def get_from_excerpt(excerpt: str, classic_eval: bool) -> Hexagram:
     elif re.match(r"^\d{1,2}:(\d,){0,5}\d$", excerpt):
         origin = excerpt[: excerpt.index(":")]
         if int(origin) not in range(1, 65):
-            print(VALUE_ERROR_MSG, file=sys.stderr)
+            print(E_EXCERPT, file=sys.stderr)
             sys.exit(1)
         changing_lines = excerpt[excerpt.index(":") + 1:].split(",")
         origin_binary = [line_value for line_value in DECIMAL_TO_BINARY[origin]]
@@ -87,6 +88,6 @@ def get_from_excerpt(excerpt: str, classic_eval: bool) -> Hexagram:
         origin = BINARY_TO_DECIMAL["".join(origin_binary)]
         trans = BINARY_TO_DECIMAL["".join(trans_binary)]
     else:
-        print(VALUE_ERROR_MSG, file=sys.stderr)
+        print(E_EXCERPT, file=sys.stderr)
         sys.exit(1)
     return Hexagram(origin, trans, changing_lines, classic_eval)
