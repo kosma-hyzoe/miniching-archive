@@ -1,13 +1,11 @@
 import os
 
-WIDTH = 80
-LINE_BREAK = "\n"
-SECTION_BREAK = LINE_BREAK * 2
-INDENT = "\t"
+WIDTH: int = 80
+LINE_BREAK: str = "\n"
+SECTION_BREAK: str = "\n\n"
+INDENT: str = "\t"
 
-default_history_dir: str = os.path.expanduser('$HOME')
+DEFAULT_HISTORY_DIR: str = os.path.expanduser("~")
+HISTORY_FILENAME: str = "i-ching-history.txt"
 
-HISTORY_PATH: str = r""
-
-TIMESTAMP_FORMAT: str = r"%d-%m-%Y %-H:%M"
-HEX_MIRROR: bool = True
+TIMESTAMP_FORMAT: str = r"%d-%m-%Y %H:%M"

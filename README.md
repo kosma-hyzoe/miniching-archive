@@ -1,56 +1,51 @@
 ## miniching
 
-A CLI-friendly, customizable I Ching tool with smart line selection,
-custom line evaluation and other improvements.
+A customizable CLI I Ching tool.
 
 ## How to run miniching?
 
-1. Make sure Python 3 is installed. The project was developed on Python 3.10.6.
+1. Make sure `python3` is installed. The project was developed on Python 3.10.6.
    Older versions should also work, but were not tested.
-2. Install the requirements from `requirements.txt`
-   (currently it only contains `pyyaml`)
-3. Download this repo.
-4. Modify `config.py` as needed.
-5. Navigate to the repo's root and either:
-    1. Run as a package/module with `python -m miniching`
-    2. Execute as a script with `./mcng`
+2. Download or clone this repo.
+3. Modify `config.py` as needed.
+4. Execute `minching/mcng`.
 
-The second way will probably require you to add execute permissions to `mcng`
-with something like `chmod u+x mcng`. I recommend adding the repo to your
-`$PATH` variable and making some functions/aliases to fit your needs, i.e.:
-
-```bash
-# classic miniching
-alias ccng="mcng --write-history --classic-eval"
-# paged miniching
-pcng() {mcng $1 | less}
-```
+I recommend adding the repo to your `$PATH` variable.
 
 Use `mcng -h` to see the options:
 
 ```
-usage: mcng [-h] [-c] [-f] [-w] [-s] [-q QUERY] [-e EXCERPT] [-t TIMESTAMP]
-            [-p HISTORY_PATH]
+usage: mcng [-h] [-z] [-r] [-s] [-q QUERY] [-e EXCERPT] [-t TIMESTAMP] [-p HISTORY_PATH] [-a] [-l--print-last]
 
 options:
   -h, --help            show this help message and exit
-  -c, --classic         use classic evaluation / 'read all changing lines'
-                        instead of the default modified Zhu Xi method
-  -f, --full-reading    get a full reading instead of just the hexagram
-                        transition result
-  -w, --write-history   write history to a txt file using the specified path
-                        (config.py or command or `-p` argument). will attempt
-                        to write in $HOME if no path was specified
-  -s, --skip-print      don't print the reading
+  -z, --zhu-xi          use the modified Zhu Xi evaluation method instead of the classic 'read all changing lines' method
+  -r, --reading         get full reading, not just the 'hex:lines -> hex' style result
+  -s, --skip-history    don't write to history, even if -p flag was provided
   -q QUERY, --query QUERY
-                        provide a query instead of using the default prompt
+                        provide a query instead of the default prompt or posix redirects
   -e EXCERPT, --excerpt EXCERPT
-                        provide an excerpt using '64' /'61:1,2' or the 3 coin
-                        sum notation ('788688' -> 23:3)
+                        provide an excerpt using the '64' /'61:1,2' formator the 3 coin sum notation where '788688' -> 23:3
   -t TIMESTAMP, --timestamp TIMESTAMP
                         provide a timestamp, any format
   -p HISTORY_PATH, --history-path HISTORY_PATH
-                        provide an alternative history path.
+                        provide an alternative history path, file or directory path
+  -a, --asci-hex        use ascii symbols to mirror the hexagram next to their numbers
+  -l--print-last        print the last history record, can be combined with -r and -p.will ignore -t, -e and -q flags
+```
+
+You can add some shell functions/aliases to fit your needs, i.e.:
+
+```bash
+# for the Zhu Xi method enthusiasts
+alias mcng="mcng --zhu-xi"
+
+# Always use custom path and print full reading
+alias mcng="mcng -p ~/documents/personal -r"
+
+# Unfortunately, to page the reading and see your query input while
+# NOT writing your embarrassing queries to shell history, you need to get hacky
+alias pcng="mcng >/dev/null; mcng -l -r"
 ```
 
 ## What is I Ching?
@@ -61,14 +56,15 @@ studies for the cool kids or a less woo-woo Tarot.
 
 ### Isn't it still a bit esoteric and weird?
 
-**It probably is.** I hope that mentioning Jung makes it digestible enough even for
+**It probably is.** I hope that mentioning Jung makes it digestible enough for
 an average western intellectual. Here's his I Ching foreword at
 [carljungdepthpsychologysite.blog](https://carljungdepthpsychologysite.blog/2020/02/03/foreword-to-the-i-ching-by-carl-gustav-jung/)
 
 ### How does I Ching divination work?
 
 The user writes down a query (usually a question) and gets a result with one
-of the divination methods - usually tossing 3 coins or arranging yarrow stalks.
+of the divination methods - usually tossing 3 coins, described below, or
+arranging yarrow stalks.
 
 The main part of the text consists of 64 hexagrams.
 Their signs consist of six lines - yin ("unbroken") and yang ("broken") ones.
@@ -80,7 +76,8 @@ a 9 or 6 gets you  an "old" yin or yang and produce changing lines.
 The result to a query can either be a static hexagram, (i.e. 3 : ䷂) or a
 hexagram transition if one or more changing lines apply
 (i.e. 3 -> 27 : ䷂ -> ䷚, with changing lines 5 and 6th).
-The user should now read all of related text using preferred evaluation method.
+The user should now read all the relevant text using their  preferred
+evaluation method.
 
 *This is of course nothing but a major oversimplification.*
 

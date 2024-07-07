@@ -6,19 +6,7 @@ class Hexagram(NamedTuple):
     origin: str
     trans: Optional[str] = None
     lines: list[str] = []
-    classic_eval: bool = False
-
-    def __str__(self):
-        if self.lines:
-            return f"{self.origin}:{','.join(self.lines)}"
-        else:
-            return self.origin
-
-
-class HistoryRecord(NamedTuple):
-    timestamp: datetime
-    query: str
-    result: str
+    zhu_xi_eval: bool = False
 
 
 class LineText(NamedTuple):
