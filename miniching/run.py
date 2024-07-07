@@ -5,7 +5,7 @@ import datetime
 
 from miniching import hexagrams
 from miniching import config as rc
-from miniching.reading.compose import compose
+from miniching.reading.compose import compose_reading
 from miniching.reading.helpers import get_result
 from miniching.reading.reading import get_full_reading
 
@@ -52,7 +52,7 @@ def run():
     query = \
         args.query if args.query \
         else input("Query: ")
-    reading = compose(hexagram, timestamp, query)
+    reading = compose_reading(hexagram, timestamp, query)
 
     result = get_result(hexagram, ascii_hex=args.asci_hex)
     if args.l__print_last:

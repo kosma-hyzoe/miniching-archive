@@ -6,13 +6,11 @@ A customizable CLI I Ching tool.
 
 1. Make sure `python3` is installed. The project was developed on Python 3.10.6.
    Older versions should also work, but were not tested.
-2. Install the requirements from `requirements.txt`
-   (currently it only contains `pyyaml`)
-3. Download this repo.
-4. Modify `config.py` as needed.
-5. Navigate to this repo's root and either:
-    1. Run as a package/module with `python -m miniching`
-    2. Execute as a script with `./mcng`
+2. Download or clone this repo.
+3. Modify `config.py` as needed.
+4. Execute `minching/mcng`
+
+I recommend adding the repo to your `$PATH` variable.
 
 Use `mcng -h` to see the options:
 
@@ -36,19 +34,18 @@ options:
   -l--print-last        print the last history record, can be combined with -r and -p.will ignore -t, -e and -q flags
 ```
 
-I recommend adding the repo to your `$PATH` variable and making some
-functions/aliases to fit your needs, i.e.:
+You can add some shell functions/aliases to fit your needs, i.e.:
 
 ```bash
-# for Zhu Xi method enthusiasts
-alias ic="mcng --zhu-xi"
+# for the Zhu Xi method enthusiasts
+alias mcng="mcng --zhu-xi"
 
 # Always use custom path and print full reading
-alias ic="mcng -r -p ~/documents"
+alias mcng="mcng -p ~/documents/personal -r"
 
 # Unfortunately, to page the reading and see your query input while
 # NOT writing your embarrassing queries to shell history, you need to get hacky
-alias icrp="mcng >/dev/null; mcng -l -r"
+alias pcng="mcng >/dev/null; mcng -l -r"
 ```
 
 ## What is I Ching?
