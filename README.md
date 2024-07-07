@@ -8,7 +8,7 @@ A customizable CLI I Ching tool.
    Older versions should also work, but were not tested.
 2. Download or clone this repo.
 3. Modify `config.py` as needed.
-4. Execute `minching/mcng`
+4. Execute `minching/mcng`.
 
 I recommend adding the repo to your `$PATH` variable.
 
